@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 public static class UpdatingController
 {
     private static List<IUpdate> _updatingObjects = new List<IUpdate>();
     private static List<IFixedUpdate> _fixedUpdates = new List<IFixedUpdate>();
+
+    public static event Action OnUpdate = delegate () { };
 
     public static void UpdateAll()
     {
@@ -11,6 +14,7 @@ public static class UpdatingController
         {
             _updatingObjects[i].UpdateTick();
         }
+        OnUpdate.Invoke();
     }
 
     public static void FixedUpdateAll()
@@ -51,5 +55,15 @@ public static class UpdatingController
         {
             _updatingObjects.Remove(update);
         }
+    }
+
+    public static void SubscribeToTUpdate(Action action)
+    {
+        OnUpdate += action;
+    }
+
+    public static void UnsubscribeFromUpdate(Action action)
+    {
+        OnUpdate -= action;
     }
 }

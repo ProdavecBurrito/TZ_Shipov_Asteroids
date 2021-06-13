@@ -5,11 +5,13 @@ public class InputController : IUpdate
     private BaseInput _baseInput;
     private ShipModel _shipModel;
     private ShipView _shipView;
+    private BulletPool _bulletPool;
 
     public InputController(InputType inputType, ShipView shipView)
     {
         _shipView = shipView;
         _shipModel = new ShipModel();
+        _bulletPool = new BulletPool(5, "Data/PlayerBullet");
         ChangeInput(inputType);
 
     }
@@ -18,6 +20,7 @@ public class InputController : IUpdate
     {
         AddAcceleration(_shipModel.AccelerationValue);
         AddRotation(_shipModel.RotationSpeed);
+        Shoot();
     }
 
     private void AddAcceleration(float value)
@@ -33,6 +36,14 @@ public class InputController : IUpdate
         if(_baseInput.IsRotating())
         {
             _baseInput.Rotate(value);
+        }
+    }
+
+    private void Shoot()
+    {
+        if (_baseInput.IsShooting())
+        {
+            _baseInput.Shoot(_bulletPool, _shipView.ShipTransform);
         }
     }
 

@@ -4,10 +4,7 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private InputType _inputType;
 
-    private BaseInput _baseInput;
     private InputController _inputController;
-    private KeyboardInput _keyboard;
-    private KeyboardPlusMouseInput _keyboardPlusMouse;
     private ShipView _shipView;
 
     private void Awake()
@@ -32,5 +29,6 @@ public class GameController : MonoBehaviour
     {
         ResourcesLoader.LoadAndInstantiateObject<GameObject>("Prefabs/Background");
         _shipView = ResourcesLoader.LoadAndInstantiateObject<ShipView>("Prefabs/Ship");
+        ResourcesLoader.LoadAndInstantiateObject<Border>("Prefabs/Border");
     }
 }
