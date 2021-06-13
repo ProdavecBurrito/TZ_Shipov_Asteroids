@@ -5,15 +5,14 @@ public class BulletPool
 {
     private List<Bullet> _bullets = new List<Bullet>();
     private BulletData _bulletData;
-    private float _delay;
     private Timer _timer;
     private bool _isFoundBullet;
-
     private int _currentBulletIndex;
 
     public BulletPool(int count, string bulletDataPath)
     {
         _bulletData = ResourcesLoader.LoadObject<BulletData>(bulletDataPath);
+        _bulletData.MaxDistance = CameraFrustrum.CalculateWidth();
         _timer = new Timer();
 
         for (int i = 0; i < count; i++)
@@ -48,7 +47,6 @@ public class BulletPool
                 {
                     if (!_bullets[i].BulletView.IsActive)
                     {
-                        Debug.Log("B");
                         _currentBulletIndex = i;
                         Shoot(fireStartPosition);
                         _isFoundBullet = true;
@@ -57,18 +55,14 @@ public class BulletPool
                 }
                 if (!_isFoundBullet)
                 {
-                    Debug.Log("C");
                     AddBullets();
                     Shoot(fireStartPosition);
-                    _currentBulletIndex++;
-                    _isFoundBullet = false;
                 }
+                _isFoundBullet = false;
             }
             else if (!_bullets[_currentBulletIndex].BulletView.IsActive)
             {
-                Debug.Log("D");
                 Shoot(fireStartPosition);
-                _currentBulletIndex++;
             }
         }
     }
@@ -78,6 +72,7 @@ public class BulletPool
         _bullets[_currentBulletIndex].Fire(fireStartPosition);
         var time = Random.Range(_bulletData.MinDelay, _bulletData.MaxDelay);
         _timer.Init(time);
+        _currentBulletIndex++;
     }
 
     private BulletView LoadBulletView()

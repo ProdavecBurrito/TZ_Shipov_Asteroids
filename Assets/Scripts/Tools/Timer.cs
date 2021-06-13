@@ -7,9 +7,9 @@ public class Timer
     public event Action EndCountDown = delegate () { };
 
     public bool IsOn;
+    public float EndTime;
 
     public float CurrentTime { get; private set; }
-    public float EndTime { get; set; }
 
     public void Init(float endtime)
     {

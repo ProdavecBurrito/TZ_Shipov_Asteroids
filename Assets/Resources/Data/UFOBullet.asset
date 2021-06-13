@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc709e99dd8d11f4d86e2ae227a8eadf, type: 3}
-  m_Name: PlayerBullet
+  m_Name: UFOBullet
   m_EditorClassIdentifier: 
   Speed: 10
-  MaxDistance: 53.333332
-  MinDelay: 0.3
-  MaxDelay: 0.31
-  BulletColor: {r: 0.03162985, g: 0.990566, b: 0.023362402, a: 1}
+  MaxDistance: 0
+  MinDelay: 2
+  MaxDelay: 5.1
+  BulletColor: {r: 1, g: 0, b: 0, a: 0}

@@ -7,12 +7,12 @@ public class Border : MonoBehaviour
     private float _rightBorder;
     private float _leftBorder;
     private float _topBorder;
-    private float _botRorder;
+    private float _botRorder;  
 
     private void Awake()
     {
         _boxCollider = GetComponent<BoxCollider2D>();
-        _boxCollider.enabled = true;
+        _boxCollider.size = CameraFrustrum.CalculateBoxSize();
         CalculateBorders();
     }
 

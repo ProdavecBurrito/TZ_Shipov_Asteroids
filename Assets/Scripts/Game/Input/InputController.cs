@@ -2,16 +2,18 @@
 
 public class InputController : IUpdate
 {
+    private const int BULLET_PULL_COUNT = 5;
+
     private BaseInput _baseInput;
     private ShipModel _shipModel;
-    private ShipView _shipView;
+    private BattleUnitView _shipView;
     private BulletPool _bulletPool;
 
-    public InputController(InputType inputType, ShipView shipView)
+    public InputController(InputType inputType, BattleUnitView shipView)
     {
         _shipView = shipView;
         _shipModel = new ShipModel();
-        _bulletPool = new BulletPool(5, "Data/PlayerBullet");
+        _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet");
         ChangeInput(inputType);
 
     }
@@ -43,20 +45,23 @@ public class InputController : IUpdate
     {
         if (_baseInput.IsShooting())
         {
-            _baseInput.Shoot(_bulletPool, _shipView.ShipTransform);
+            _baseInput.Shoot(_bulletPool, _shipView.FireStartPosition);
         }
     }
 
     public void ChangeInput(InputType inputType)
     {
-        switch (inputType)
+        if (_shipView is ShipView shipView)
         {
-            case InputType.Keyboard:
-                _baseInput = new KeyboardInput(_shipView.ShipRigidBody);
-                break;
-            case InputType.KeyboardPlusMouse:
-                _baseInput = new KeyboardPlusMouseInput(_shipView.ShipRigidBody);
-                break;
+            switch (inputType)
+            {
+                case InputType.Keyboard:
+                    _baseInput = new KeyboardInput(shipView.ShipRigidbody);
+                    break;
+                case InputType.KeyboardPlusMouse:
+                    _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
+                    break;
+            }
         }
     }
 }

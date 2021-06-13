@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "PlayerShip", menuName = "MainShip/Create")]
+[CreateAssetMenu(fileName = "PlayerShip", menuName = "Create/PlayerShip")]
 public class ShipData : ScriptableObject
 {
     public float MaxSpeed;

@@ -5,13 +5,15 @@ public class GameController : MonoBehaviour
     [SerializeField] private InputType _inputType;
 
     private InputController _inputController;
-    private ShipView _shipView;
+    private BattleUnitView _shipView;
+    private BattleUnitView _ufoView;
+    private UFOSpawnController _ufoSpawnController;
 
     private void Awake()
     {
         LoadBaseObjects();
         _inputController = new InputController(_inputType, _shipView);
-
+        _ufoSpawnController = new UFOSpawnController(_ufoView);
         UpdatingController.AddToUpdate(_inputController);
     }
 
@@ -28,7 +30,13 @@ public class GameController : MonoBehaviour
     private void LoadBaseObjects()
     {
         ResourcesLoader.LoadAndInstantiateObject<GameObject>("Prefabs/Background");
-        _shipView = ResourcesLoader.LoadAndInstantiateObject<ShipView>("Prefabs/Ship");
+        _shipView = ResourcesLoader.LoadAndInstantiateObject<BattleUnitView>("Prefabs/Ship");
         ResourcesLoader.LoadAndInstantiateObject<Border>("Prefabs/Border");
+        _ufoView = ResourcesLoader.LoadAndInstantiateObject<BattleUnitView>("Prefabs/UFO");
+    }
+
+    private void OnDestroy()
+    {
+        UpdatingController.RemoveFromUpdate(_inputController);
     }
 }

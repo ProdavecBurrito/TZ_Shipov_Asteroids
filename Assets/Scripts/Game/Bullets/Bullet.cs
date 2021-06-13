@@ -41,7 +41,6 @@ public class Bullet
 
     public void ReturnToPool()
     {
-        Debug.Log("A");
         _bulletView.ChangeActiveState(false);
         UpdatingController.UnsubscribeFromUpdate(Fly);
     }
