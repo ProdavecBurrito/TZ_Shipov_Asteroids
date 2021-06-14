@@ -15,4 +15,4 @@ MonoBehaviour:
   Speed: 5
   Score: 0
   MinSpawnTime: 2
-  MaxSpawnTime: 10
+  MaxSpawnTime: 4

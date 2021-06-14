@@ -1,21 +1,25 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class InputController : IUpdate
+public class InputController : IUpdate, IDisposable
 {
     private const int BULLET_PULL_COUNT = 5;
 
+    private InputType _inputType;
     private BaseInput _baseInput;
     private ShipModel _shipModel;
     private BattleUnitView _shipView;
     private BulletPool _bulletPool;
+    private GameMenuController _gameMenuController;
 
-    public InputController(InputType inputType, BattleUnitView shipView)
+    public InputController(BattleUnitView shipView, GameMenuController gameMenuController)
     {
         _shipView = shipView;
         _shipModel = new ShipModel();
         _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet");
-        ChangeInput(inputType);
-
+        AssignInput(PlayerPrefs.GetInt("InputSettings"));
+        _gameMenuController = gameMenuController;
+        _gameMenuController.OnImputChange += ChangeInput;
     }
 
     public void UpdateTick()
@@ -23,6 +27,13 @@ public class InputController : IUpdate
         AddAcceleration(_shipModel.AccelerationValue);
         AddRotation(_shipModel.RotationSpeed);
         Shoot();
+        OpenMenu();
+        _bulletPool.UpdateTick();
+    }
+
+    private void OpenMenu()
+    {
+        _baseInput.OpenMenu(_gameMenuController);
     }
 
     private void AddAcceleration(float value)
@@ -49,19 +60,40 @@ public class InputController : IUpdate
         }
     }
 
-    public void ChangeInput(InputType inputType)
+    public void AssignInput(int inputData)
     {
         if (_shipView is ShipView shipView)
         {
-            switch (inputType)
+            switch (inputData)
             {
-                case InputType.Keyboard:
+                case 0:
                     _baseInput = new KeyboardInput(shipView.ShipRigidbody);
                     break;
-                case InputType.KeyboardPlusMouse:
+                case 1:
                     _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
                     break;
             }
         }
+    }
+
+    public void ChangeInput()
+    {
+        if (_shipView is ShipView shipView)
+        {
+            switch (_inputType)
+            {
+                case InputType.Keyboard:
+                    _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
+                    break;
+                case InputType.KeyboardPlusMouse:
+                    _baseInput = new KeyboardInput(shipView.ShipRigidbody);
+                    break;
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _gameMenuController.OnImputChange -= ChangeInput;
     }
 }

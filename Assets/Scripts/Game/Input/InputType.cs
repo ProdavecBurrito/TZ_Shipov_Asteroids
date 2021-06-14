@@ -1,5 +1,5 @@
 ﻿public enum InputType
 {
-    Keyboard,
-    KeyboardPlusMouse
+    Keyboard = 0,
+    KeyboardPlusMouse = 1,
 }

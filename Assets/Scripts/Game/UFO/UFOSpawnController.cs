@@ -1,17 +1,23 @@
 using System;
 using Random = UnityEngine.Random;
 
-public class UFOSpawnController : IDisposable
+public class UFOSpawnController : IUpdate , IDisposable
 {
     private Timer _timer;
-    private UFOCountroller _ufoCountroller;
+    private UFOController _ufoCountroller;
 
-    public UFOSpawnController(BattleUnitView battleUnitView)
+    public UFOSpawnController(BattleUnitView battleUnitView, ShipView target)
     {
-        _ufoCountroller = new UFOCountroller(battleUnitView);
+        _ufoCountroller = new UFOController(battleUnitView, target);
         _timer = new Timer();
         CalculateTime();
-        UpdatingController.SubscribeToTUpdate(TrySpawnUFO);
+    }
+
+    public void UpdateTick()
+    {
+        TrySpawnUFO();
+        _ufoCountroller.UpdateTick();
+        _timer.CountTime();
     }
 
     public void TrySpawnUFO()
@@ -34,6 +40,6 @@ public class UFOSpawnController : IDisposable
 
     public void Dispose()
     {
-        UpdatingController.UnsubscribeFromUpdate(TrySpawnUFO);
+        _timer.EndCountDown -= _ufoCountroller.Launch;
     }
 }

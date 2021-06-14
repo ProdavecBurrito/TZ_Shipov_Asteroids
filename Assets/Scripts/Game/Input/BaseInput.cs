@@ -9,6 +9,14 @@ public abstract class BaseInput
         _movingBody = rigidbody2D;
     }
 
+    public void OpenMenu(GameMenuController MainMenu)
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            MainMenu.gameObject.SetActive(true);
+        }
+    }
+
     public virtual bool IsMoving()
     {
         return (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow));

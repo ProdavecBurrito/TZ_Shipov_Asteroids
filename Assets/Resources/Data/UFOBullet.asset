@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc709e99dd8d11f4d86e2ae227a8eadf, type: 3}
   m_Name: UFOBullet
   m_EditorClassIdentifier: 
-  Speed: 10
-  MaxDistance: 0
+  Speed: 20
+  MaxDistance: 53.30619
   MinDelay: 2
   MaxDelay: 5.1
-  BulletColor: {r: 1, g: 0, b: 0, a: 0}
+  BulletColor: {r: 1, g: 0, b: 0, a: 1}

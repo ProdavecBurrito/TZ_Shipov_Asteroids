@@ -2,6 +2,8 @@
 
 public class KeyboardInput : BaseInput
 {
+    private const float SOMPENSATE_ROTATION_SPEED = 5.0f;
+
     public KeyboardInput(Rigidbody2D rigidbody2D) : base(rigidbody2D)
     {
     }
@@ -13,6 +15,6 @@ public class KeyboardInput : BaseInput
 
     public override void Rotate(float rotationSpeed)
     {
-        _movingBody.rotation += -Input.GetAxis("Horizontal") * rotationSpeed * Time.fixedDeltaTime;
+        _movingBody.rotation += -Input.GetAxis("Horizontal") * (rotationSpeed * SOMPENSATE_ROTATION_SPEED) * Time.fixedDeltaTime;
     }
 }

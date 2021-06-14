@@ -19,6 +19,6 @@ public class BaseUnitView : MonoBehaviour, IDamageble
     public void SetActivity(bool isActive)
     {
         _isActive = isActive;
-        _unitTransform.gameObject.SetActive(isActive);
+        _unitTransform.gameObject.SetActive(isActive);  
     }
 }

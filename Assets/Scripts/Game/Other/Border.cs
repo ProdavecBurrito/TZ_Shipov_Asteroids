@@ -18,7 +18,6 @@ public class Border : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log(collision.name);
         RemoveCollision(collision);
     }
 

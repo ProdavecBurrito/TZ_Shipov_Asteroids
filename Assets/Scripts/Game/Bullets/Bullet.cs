@@ -1,8 +1,9 @@
 using UnityEngine;
+using System;
 
-public class Bullet 
+public class Bullet : IDisposable
 {
-    private Vector3 _startPosition;
+    private float _startPosition;
     private BulletView _bulletView;
 
     private float _speed;
@@ -20,13 +21,17 @@ public class Bullet
 
     public void Fly()
     {
-        if (BulletView.transform.position.magnitude < _maxRange)
+        if (_bulletView.IsActive)
         {
-            _bulletView.transform.Translate(-Vector2.up * _speed * Time.deltaTime);
-        }
-        else
-        {
-            ReturnToPool();
+            if (_startPosition < _maxRange)
+            {
+                _startPosition += _speed * Time.deltaTime;
+                _bulletView.transform.Translate(-Vector2.up * _speed * Time.deltaTime);
+            }
+            else
+            {
+                ReturnToPool();
+            }
         }
     }
 
@@ -34,14 +39,16 @@ public class Bullet
     {
         _bulletView.transform.position = fireStartTransform.position;
         _bulletView.transform.rotation = fireStartTransform.rotation;
-        _startPosition = _bulletView.transform.position;
+        _startPosition = 0;
         _bulletView.ChangeActiveState(true);
-        UpdatingController.SubscribeToTUpdate(Fly);
     }
 
     public void ReturnToPool()
     {
         _bulletView.ChangeActiveState(false);
-        UpdatingController.UnsubscribeFromUpdate(Fly);
+    }
+
+    public void Dispose()
+    {
     }
 }

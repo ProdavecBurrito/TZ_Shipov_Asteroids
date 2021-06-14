@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PlayerShip
   m_EditorClassIdentifier: 
   MaxSpeed: 10
-  RotationSpeed: 10
+  RotationSpeed: 5
   AccelerationValue: 25
   Health: 3

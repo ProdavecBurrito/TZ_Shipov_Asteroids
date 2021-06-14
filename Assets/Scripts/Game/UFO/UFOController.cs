@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class UFOCountroller : IDisposable
+public class UFOController : IDisposable
 {
     private const int BULLET_PULL_COUNT = 5;
 
@@ -20,9 +20,10 @@ public class UFOCountroller : IDisposable
 
     public UFOView UfoView => _ufoView;
 
-    public UFOCountroller(BattleUnitView battleUnitView)
+    public UFOController(BattleUnitView battleUnitView, ShipView target)
     {
         _ufoView = (UFOView)battleUnitView;
+        _ufoView.GetTarget(target);
         _ufoModel = new UFOModel();
         _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/UFOBullet");
         _fifthPartOfHight = CameraFrustrum.GetFifthPartOfHight();
@@ -30,14 +31,22 @@ public class UFOCountroller : IDisposable
 
     public void UpdateTick()
     {
-        FolowTarget();
-        Move();
-        TryToShoot();
+        if (_ufoView.IsActive)
+        {
+            FolowTarget();
+            Move();
+            TryToShoot();
+            _bulletPool.UpdateTick();
+        }
     }
 
     public void FolowTarget()
     {
-        _ufoView.FireStartPosition.position = _ufoView.ShipTransform.position - _ufoView.Target.position;
+        var direction = _ufoView.Target.position - _ufoView.ShipTransform.position;
+        var position = -(_ufoView.ShipTransform.position - _ufoView.Target.position).normalized;
+        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90.0f;
+        _ufoView.FireStartPosition.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        _ufoView.FireStartPosition.localPosition = position;
     }
 
     public void StartMoving(Vector2 startPosition)
@@ -52,11 +61,10 @@ public class UFOCountroller : IDisposable
 
     public Vector2 CalculateStartPosition()
     {
-        _hight = Random.Range(-CameraFrustrum.CalculateHight() / 2, CameraFrustrum.CalculateHight() / 2);
-        var num = Random.Range(0, 2);
-        if (num == 1)
+        _hight = Random.Range(-CameraFrustrum.CalculateHight() / 2 + _fifthPartOfHight, CameraFrustrum.CalculateHight() / 2 - _fifthPartOfHight);
+        var spawnWidth = Random.Range(0, 2);
+        if (spawnWidth == 1)
         {
-            Debug.Log("1");
             _width = CameraFrustrum.CalculateWidth() / 2;
         }
         else
@@ -71,8 +79,6 @@ public class UFOCountroller : IDisposable
         {
             _direction = 1;
         }
-        Debug.Log(_width);
-        Debug.Log(_hight);
         return new Vector2(_width, _hight);
     }
 
@@ -85,17 +91,14 @@ public class UFOCountroller : IDisposable
     {
         _ufoView.SetActivity(true);
         StartMoving(CalculateStartPosition());
-        UpdatingController.SubscribeToTUpdate(UpdateTick);
     }
 
     public void Die()
     {
-        UpdatingController.UnsubscribeFromUpdate(UpdateTick);
         _ufoView.SetActivity(false);
     }
 
     public void Dispose()
     {
-        UpdatingController.UnsubscribeFromUpdate(UpdateTick);
     }
 }

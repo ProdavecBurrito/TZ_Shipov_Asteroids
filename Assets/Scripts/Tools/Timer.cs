@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Timer
+public class Timer : IDisposable
 {
     public event Action StartCountDown = delegate () { };
     public event Action EndCountDown = delegate () { };
@@ -15,7 +15,6 @@ public class Timer
     {
         EndTime = endtime;
         IsOn = true;
-        UpdatingController.SubscribeToTUpdate(CountTime);
         StartCountDown?.Invoke();
     }
 
@@ -23,7 +22,6 @@ public class Timer
     {
         CurrentTime = 0.0f;
         IsOn = false;
-        UpdatingController.UnsubscribeFromUpdate(CountTime);
     }
 
     public bool IsTimeOver()
@@ -39,7 +37,6 @@ public class Timer
     {
         if (IsOn)
         {
-            //Debug.Log(CurrentTime);
             if (CurrentTime < EndTime)
             {
                 CurrentTime += Time.deltaTime;
@@ -50,5 +47,10 @@ public class Timer
                 Reset();
             }
         }
+    }
+
+    public void Dispose()
+    {
+        CurrentTime = 0;
     }
 }

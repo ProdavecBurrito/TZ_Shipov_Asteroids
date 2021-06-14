@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
 
-public class BulletPool
+public class BulletPool : IUpdate, IDisposable
 {
     private List<Bullet> _bullets = new List<Bullet>();
     private BulletData _bulletData;
@@ -78,5 +80,19 @@ public class BulletPool
     private BulletView LoadBulletView()
     {
         return ResourcesLoader.LoadAndInstantiateObject<BulletView>("Prefabs/Bullet");
+    }
+
+    public void Dispose()
+    {
+        _bullets.Clear();
+    }
+
+    public void UpdateTick()
+    {
+        for (int i = 0; i < _bullets.Count; i++)
+        {
+            _bullets[i].Fly();
+        }
+        _timer.CountTime();
     }
 }
