@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class UFOModel : IScoreKeeper
@@ -5,7 +6,7 @@ public class UFOModel : IScoreKeeper
     private UFOData _ufoData;
     private float _speed;
 
-    public float Score { get; set; }
+    public int Score { get; set; }
     public UFOData UfoData => _ufoData;
     public float Speed => _speed;
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-public class MainMenuController : BaseMenuController
+public class MainMenu : BaseMenu
 {
     private void Awake()
     {

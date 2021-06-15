@@ -10,10 +10,12 @@ public class BulletPool : IUpdate, IDisposable
     private Timer _timer;
     private bool _isFoundBullet;
     private int _currentBulletIndex;
+    private string _prefabPath;
 
-    public BulletPool(int count, string bulletDataPath)
+    public BulletPool(int count, string bulletDataPath, string bulletPrefabPath)
     {
         _bulletData = ResourcesLoader.LoadObject<BulletData>(bulletDataPath);
+        _prefabPath = bulletPrefabPath;
         _bulletData.MaxDistance = CameraFrustrum.CalculateWidth();
         _timer = new Timer();
 
@@ -77,9 +79,9 @@ public class BulletPool : IUpdate, IDisposable
         _currentBulletIndex++;
     }
 
-    private BulletView LoadBulletView()
+    private BaseBulletView LoadBulletView()
     {
-        return ResourcesLoader.LoadAndInstantiateObject<BulletView>("Prefabs/Bullet");
+        return ResourcesLoader.LoadAndInstantiateObject<BaseBulletView>(_prefabPath);
     }
 
     public void Dispose()

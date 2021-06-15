@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 6768999360398274963}
   - component: {fileID: 7123195323827442294}
   - component: {fileID: 4706842756944813852}
-  - component: {fileID: 1900131132814170349}
+  - component: {fileID: -7242664459278123267}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: UFOBullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,7 +101,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &1900131132814170349
+--- !u!114 &-7242664459278123267
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -110,6 +110,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 9199888627727335780}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0f406bc1814572641ad236983a8aae95, type: 3}
+  m_Script: {fileID: 11500000, guid: 92fd19304c482f546b5abfb3e1952c7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

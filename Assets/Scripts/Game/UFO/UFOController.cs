@@ -1,15 +1,15 @@
-using System;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class UFOController : IDisposable
+public class UFOController
 {
-    private const int BULLET_PULL_COUNT = 5;
+    private const int RIGHT_SPAWN = 1;
+    private const int LEFT_SPAWN = 0;
+    private const int HALF_VALUE = 2;
 
     private UFOView _ufoView;
     private UFOModel _ufoModel;
     private BulletPool _bulletPool;
-
+    private ScoreUI _scoreUI;
 
     private int _direction;
     private float _hight;
@@ -20,27 +20,45 @@ public class UFOController : IDisposable
 
     public UFOView UfoView => _ufoView;
 
-    public UFOController(BattleUnitView battleUnitView, ShipView target)
+    public UFOController(BattleUnitView battleUnitView, ShipView target, BulletPool bulletPool, ScoreUI scoreUI)
     {
         _ufoView = (UFOView)battleUnitView;
         _ufoView.GetTarget(target);
         _ufoModel = new UFOModel();
-        _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/UFOBullet");
+        _bulletPool = bulletPool;
         _fifthPartOfHight = CameraFrustrum.GetFifthPartOfHight();
+        _scoreUI = scoreUI;
+
+        _ufoView.OnHit += AddScore;
     }
 
     public void UpdateTick()
+    {
+        ExecuteUpdate();
+    }
+
+    public void AddScore()
+    {
+        _scoreUI.AddScore(_ufoModel.Score);
+    }
+
+    public void LaunchUFO()
+    {
+        _ufoView.SetActivity(true);
+        StartMoving(CalculateStartPosition());
+    }
+
+    private void ExecuteUpdate()
     {
         if (_ufoView.IsActive)
         {
             FolowTarget();
             Move();
             TryToShoot();
-            _bulletPool.UpdateTick();
         }
     }
 
-    public void FolowTarget()
+    private void FolowTarget()
     {
         var direction = _ufoView.Target.position - _ufoView.ShipTransform.position;
         var position = -(_ufoView.ShipTransform.position - _ufoView.Target.position).normalized;
@@ -49,29 +67,29 @@ public class UFOController : IDisposable
         _ufoView.FireStartPosition.localPosition = position;
     }
 
-    public void StartMoving(Vector2 startPosition)
+    private void StartMoving(Vector2 startPosition)
     {
         _ufoView.ShipTransform.position = startPosition;
     }
 
-    public void Move()
+    private void Move()
     {
         _ufoView.ShipTransform.Translate(Vector2.right * _direction * _ufoModel.Speed * Time.deltaTime);
     }
 
-    public Vector2 CalculateStartPosition()
+    private Vector2 CalculateStartPosition()
     {
-        _hight = Random.Range(-CameraFrustrum.CalculateHight() / 2 + _fifthPartOfHight, CameraFrustrum.CalculateHight() / 2 - _fifthPartOfHight);
-        var spawnWidth = Random.Range(0, 2);
-        if (spawnWidth == 1)
+        _hight = Random.Range(-CameraFrustrum.CalculateHight() / HALF_VALUE + _fifthPartOfHight, CameraFrustrum.CalculateHight() / HALF_VALUE - _fifthPartOfHight);
+        var spawnWidth = Random.Range(LEFT_SPAWN, RIGHT_SPAWN + 1);
+        if (spawnWidth == RIGHT_SPAWN)
         {
-            _width = CameraFrustrum.CalculateWidth() / 2;
+            _width = CameraFrustrum.CalculateWidth() / HALF_VALUE;
         }
         else
         {
-            _width = -CameraFrustrum.CalculateWidth() / 2;
+            _width = -CameraFrustrum.CalculateWidth() / HALF_VALUE;
         }
-        if (_width > CameraFrustrum.CalculateHight() / 2)
+        if (_width > CameraFrustrum.CalculateHight() / HALF_VALUE)
         {
             _direction = -1;
         }
@@ -82,23 +100,8 @@ public class UFOController : IDisposable
         return new Vector2(_width, _hight);
     }
 
-    public void TryToShoot()
+    private void TryToShoot()
     {
         _bulletPool.TryShoot(_ufoView.FireStartPosition);
-    }
-
-    public void Launch()
-    {
-        _ufoView.SetActivity(true);
-        StartMoving(CalculateStartPosition());
-    }
-
-    public void Die()
-    {
-        _ufoView.SetActivity(false);
-    }
-
-    public void Dispose()
-    {
     }
 }

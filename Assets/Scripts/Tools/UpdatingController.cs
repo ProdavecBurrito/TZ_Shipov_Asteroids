@@ -12,9 +12,9 @@ public static class UpdatingController
     {
         for (int i = 0; i < _updatingObjects.Count; i++)
         {
-            _updatingObjects[i]?.UpdateTick();
+            _updatingObjects[i].UpdateTick();
         }
-        OnUpdate?.Invoke();
+        OnUpdate.Invoke();
     }
 
     public static void FixedUpdateAll()

@@ -9,7 +9,7 @@ public abstract class BaseInput
         _movingBody = rigidbody2D;
     }
 
-    public void OpenMenu(GameMenuController MainMenu)
+    public void OpenMenu(GameMenu MainMenu)
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {

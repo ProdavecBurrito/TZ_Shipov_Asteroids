@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class BaseUnitView : MonoBehaviour, IDamageble
+public class BaseUnitView : MonoBehaviour, IDamageable
 {
-    public event Action OnHit = delegate (){};
+    public event Action OnHit = delegate () { };
 
     protected Transform _unitTransform;
     private bool _isActive;
@@ -11,8 +11,9 @@ public class BaseUnitView : MonoBehaviour, IDamageble
     public Transform ShipTransform => _unitTransform;
     public bool IsActive => _isActive;
 
-    public void GetDamage()
+    public virtual void GetDamage()
     {
+        SetActivity(false);
         OnHit.Invoke();
     }
 

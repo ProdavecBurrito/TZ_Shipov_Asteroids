@@ -4,14 +4,14 @@ using System;
 public class Bullet : IDisposable
 {
     private float _startPosition;
-    private BulletView _bulletView;
+    private BaseBulletView _bulletView;
 
     private float _speed;
     private float _maxRange;
 
-    public BulletView BulletView => _bulletView;
+    public BaseBulletView BulletView => _bulletView;
 
-    public Bullet(float speed, float maxRange, BulletView bulletView, Color bulletColor)
+    public Bullet(float speed, float maxRange, BaseBulletView bulletView, Color bulletColor)
     {
         _speed = speed;
         _maxRange = maxRange;

@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameMenuController : BaseMenuController
+public class GameMenu : BaseMenu
 {
     public event Action OnImputChange = delegate () { };
 
@@ -14,6 +14,7 @@ public class GameMenuController : BaseMenuController
         InitButtons();
         _inputType = (InputType)PlayerPrefs.GetInt("InputSettings");
         _inputText = _changeInput.GetComponentInChildren<TMP_Text>();
+        AssignStartInputText(PlayerPrefs.GetInt("InputSettings"));
     }
 
     private void OnEnable()

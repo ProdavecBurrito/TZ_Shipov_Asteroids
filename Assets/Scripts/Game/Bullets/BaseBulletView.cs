@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class BulletView : MonoBehaviour
+public class BaseBulletView : MonoBehaviour
 {
     private Transform _transform;
     private SpriteRenderer _spriteRenderer;
@@ -14,14 +14,6 @@ public class BulletView : MonoBehaviour
         _transform = GetComponent<Transform>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         ChangeActiveState(false);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision is IDamageble damageble)
-        {
-            damageble.GetDamage();
-        }
     }
 
     public void ChangeActiveState(bool isActive)

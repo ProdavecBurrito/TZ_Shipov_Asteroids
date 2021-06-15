@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
-public abstract class BaseMenuController : MonoBehaviour
+public abstract class BaseMenu : MonoBehaviour
 {
     protected const string KEYBOARD = "Control: Keybord";
     protected const string KEY_PLUS_MOUSE = "Control: Keybord Plus Mouse";
@@ -28,6 +28,18 @@ public abstract class BaseMenuController : MonoBehaviour
             PlayerPrefs.SetInt("InputSettings", 0);
             _inputText.text = KEYBOARD;
             _inputType = (InputType)0;
+        }
+    }
+
+    protected void AssignStartInputText(int inputType)
+    {
+        if (inputType == 0)
+        {
+            _inputText.text = KEYBOARD;
+        }
+        else
+        {
+            _inputText.text = KEY_PLUS_MOUSE;
         }
     }
 

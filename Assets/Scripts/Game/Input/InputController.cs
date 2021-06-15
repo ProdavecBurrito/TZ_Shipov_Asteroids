@@ -3,23 +3,28 @@ using UnityEngine;
 
 public class InputController : IUpdate, IDisposable
 {
-    private const int BULLET_PULL_COUNT = 5;
+    private const int BULLET_PULL_COUNT = 15;
 
     private InputType _inputType;
     private BaseInput _baseInput;
     private ShipModel _shipModel;
     private BattleUnitView _shipView;
     private BulletPool _bulletPool;
-    private GameMenuController _gameMenuController;
+    private GameMenu _gameMenuController;
+    private HealthUI _healthUI;
 
-    public InputController(BattleUnitView shipView, GameMenuController gameMenuController)
+    public InputController(BattleUnitView shipView, GameMenu gameMenuController, HealthUI healthUI)
     {
         _shipView = shipView;
-        _shipModel = new ShipModel();
-        _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet");
+        _shipModel = new ShipModel((ShipView)_shipView);
+        _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet", "Prefabs/PlayerBullet");
         AssignInput(PlayerPrefs.GetInt("InputSettings"));
         _gameMenuController = gameMenuController;
+        _healthUI = healthUI;
+
+        _shipView.OnHit += _shipModel.Hit;
         _gameMenuController.OnImputChange += ChangeInput;
+        _shipModel.OnHealthChange += _healthUI.ReduceScore;
     }
 
     public void UpdateTick()
@@ -60,7 +65,7 @@ public class InputController : IUpdate, IDisposable
         }
     }
 
-    public void AssignInput(int inputData)
+    private void AssignInput(int inputData)
     {
         if (_shipView is ShipView shipView)
         {
@@ -68,15 +73,17 @@ public class InputController : IUpdate, IDisposable
             {
                 case 0:
                     _baseInput = new KeyboardInput(shipView.ShipRigidbody);
+                    _inputType = InputType.Keyboard;
                     break;
                 case 1:
                     _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
+                    _inputType = InputType.KeyboardPlusMouse;
                     break;
             }
         }
     }
 
-    public void ChangeInput()
+    private void ChangeInput()
     {
         if (_shipView is ShipView shipView)
         {
@@ -84,9 +91,13 @@ public class InputController : IUpdate, IDisposable
             {
                 case InputType.Keyboard:
                     _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
+                    _inputType = InputType.KeyboardPlusMouse;
+                    Debug.Log("A");
                     break;
                 case InputType.KeyboardPlusMouse:
                     _baseInput = new KeyboardInput(shipView.ShipRigidbody);
+                    _inputType = InputType.Keyboard;
+                    Debug.Log("B");
                     break;
             }
         }
@@ -94,6 +105,8 @@ public class InputController : IUpdate, IDisposable
 
     public void Dispose()
     {
+        _shipView.OnHit -= _shipModel.Hit;
         _gameMenuController.OnImputChange -= ChangeInput;
+        _shipModel.OnHealthChange -= _healthUI.ReduceScore;
     }
 }

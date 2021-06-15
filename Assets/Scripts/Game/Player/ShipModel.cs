@@ -1,10 +1,12 @@
 using System;
+using UnityEngine;
 
 public class ShipModel
 {
-    public event Action OnHit = delegate () { };
+    public event Action OnHealthChange = delegate () { };
 
     private ShipData _shipData;
+    private Invincibility _invincibility;
 
     private int _health;
     private float _maxSpeed;
@@ -15,9 +17,10 @@ public class ShipModel
     public float RotationSpeed => _rotationSpeed;
     public float AccelerationValue => _accelerationValue;
 
-    public ShipModel()
+    public ShipModel(ShipView shipView)
     {
         _shipData = ResourcesLoader.LoadObject<ShipData>("Data/PlayerShip");
+        _invincibility = new Invincibility(shipView);
         _maxSpeed = _shipData.MaxSpeed;
         _rotationSpeed = _shipData.RotationSpeed;
         _accelerationValue = _shipData.AccelerationValue;
@@ -26,10 +29,16 @@ public class ShipModel
 
     public void Hit()
     {
-        if (_health > 0)
+        Debug.Log(!_invincibility.IsInvincible);
+        if (!_invincibility.IsInvincible)
         {
-            _health--;
-            OnHit.Invoke();
+            
+            if (_health > 0)
+            {
+                _health--;
+                OnHealthChange.Invoke();
+                _invincibility.StartInvincibility();
+            }
         }
     }
 }

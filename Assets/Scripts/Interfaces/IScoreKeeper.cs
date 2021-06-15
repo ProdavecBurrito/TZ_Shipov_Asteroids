@@ -1,4 +1,6 @@
-﻿public interface IScoreKeeper
+﻿using System;
+
+public interface IScoreKeeper
 {
-    public float Score { get; set; }
+    public int Score { get; set; }
 }

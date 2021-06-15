@@ -4,7 +4,7 @@ using UnityEngine;
 public class UFOData : ScriptableObject
 {
     public float Speed;
-    public float Score;
+    public int Score;
     public int MinSpawnTime;
     public int MaxSpawnTime;
 }
