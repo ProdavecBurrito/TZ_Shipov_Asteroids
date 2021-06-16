@@ -33,9 +33,9 @@ public abstract class BaseInput
         return Input.GetKeyDown(KeyCode.Space);
     }
 
-    public void Shoot(BulletPool bulletPool ,Transform fireStartPos)
+    public void Shoot(BasePool<Bullet> bulletPool ,Transform fireStartPos)
     {
-        bulletPool.TryShoot(fireStartPos);
+        bulletPool.TryToAct(fireStartPos);
     }
 
     public abstract bool IsRotating();

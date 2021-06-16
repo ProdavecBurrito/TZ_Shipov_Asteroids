@@ -1,9 +1,9 @@
 using System;
-using UnityEngine;
 
 public class ShipModel
 {
     public event Action OnHealthChange = delegate () { };
+    public event Action OnDie = delegate () { };
 
     private ShipData _shipData;
     private Invincibility _invincibility;
@@ -16,8 +16,9 @@ public class ShipModel
     public float MaxSpeed => _maxSpeed;
     public float RotationSpeed => _rotationSpeed;
     public float AccelerationValue => _accelerationValue;
+    public int Health => _health;
 
-    public ShipModel(ShipView shipView)
+    public ShipModel(BaseUnitView shipView)
     {
         _shipData = ResourcesLoader.LoadObject<ShipData>("Data/PlayerShip");
         _invincibility = new Invincibility(shipView);
@@ -29,15 +30,17 @@ public class ShipModel
 
     public void Hit()
     {
-        Debug.Log(!_invincibility.IsInvincible);
         if (!_invincibility.IsInvincible)
         {
-            
+            _health--;
             if (_health > 0)
             {
-                _health--;
                 OnHealthChange.Invoke();
                 _invincibility.StartInvincibility();
+            }
+            else
+            {
+                OnDie.Invoke();
             }
         }
     }

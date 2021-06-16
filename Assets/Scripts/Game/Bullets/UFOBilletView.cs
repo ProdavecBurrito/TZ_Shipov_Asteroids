@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class UFOBilletView : BaseBulletView
@@ -10,7 +8,7 @@ public class UFOBilletView : BaseBulletView
         {
             if (playerShip != null)
             {
-                playerShip.GetDamage();
+                playerShip.GetDamage(false);
             }
         }
     }

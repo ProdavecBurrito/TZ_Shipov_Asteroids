@@ -1,9 +1,9 @@
 using UnityEngine;
 using System;
 
-public class Bullet : IDisposable
+public class Bullet
 {
-    private float _startPosition;
+    private float _currentPosition;
     private BaseBulletView _bulletView;
 
     private float _speed;
@@ -23,9 +23,9 @@ public class Bullet : IDisposable
     {
         if (_bulletView.IsActive)
         {
-            if (_startPosition < _maxRange)
+            if (_currentPosition < _maxRange)
             {
-                _startPosition += _speed * Time.deltaTime;
+                _currentPosition += _speed * Time.deltaTime;
                 _bulletView.transform.Translate(-Vector2.up * _speed * Time.deltaTime);
             }
             else
@@ -35,20 +35,16 @@ public class Bullet : IDisposable
         }
     }
 
-    public void Fire(Transform fireStartTransform)
+    public void Fire(Transform fireStartPosition)
     {
-        _bulletView.transform.position = fireStartTransform.position;
-        _bulletView.transform.rotation = fireStartTransform.rotation;
-        _startPosition = 0;
+        _bulletView.transform.position = fireStartPosition.position;
+        _bulletView.transform.rotation = fireStartPosition.rotation;
+        _currentPosition = 0;
         _bulletView.ChangeActiveState(true);
     }
 
     public void ReturnToPool()
     {
         _bulletView.ChangeActiveState(false);
-    }
-
-    public void Dispose()
-    {
     }
 }

@@ -1,18 +1,15 @@
-using System.Collections.Generic;
 using UnityEngine;
-using System;
 using Random = UnityEngine.Random;
 
-public class BulletPool : IUpdate, IDisposable
+public class BulletPool : BasePool<Bullet>, IUpdate
 {
-    private List<Bullet> _bullets = new List<Bullet>();
     private BulletData _bulletData;
-    private Timer _timer;
     private bool _isFoundBullet;
     private int _currentBulletIndex;
+    protected Timer _timer;
     private string _prefabPath;
 
-    public BulletPool(int count, string bulletDataPath, string bulletPrefabPath)
+    public BulletPool(int count, string bulletDataPath, string bulletPrefabPath) : base(count)
     {
         _bulletData = ResourcesLoader.LoadObject<BulletData>(bulletDataPath);
         _prefabPath = bulletPrefabPath;
@@ -21,35 +18,19 @@ public class BulletPool : IUpdate, IDisposable
 
         for (int i = 0; i < count; i++)
         {
-            AddBullets();
-        }
-
-        _currentBulletIndex = 0;
-    }
-
-    private void AddBullets()
-    {
-        var bullet = new Bullet(_bulletData.Speed, _bulletData.MaxDistance, LoadBulletView(), _bulletData.BulletColor);
-        _bullets.Add(bullet);
-    }
-
-    private void RemoveBullets(int index)
-    {
-        if (_bullets.Contains(_bullets[index]))
-        {
-            _bullets.Remove(_bullets[index]);
+            CreateNewBullet();
         }
     }
 
-    public void TryShoot(Transform fireStartPosition)
+    public override void TryToAct(Transform fireStartPosition)
     {
         if (!_timer.IsOn)
         {
-            if (_currentBulletIndex >= _bullets.Count)
+            if (_currentBulletIndex >= _poolObjects.Count)
             {
-                for (int i = 0; i < _bullets.Count; i++)
+                for (int i = 0; i < _poolObjects.Count; i++)
                 {
-                    if (!_bullets[i].BulletView.IsActive)
+                    if (!_poolObjects[i].BulletView.IsActive)
                     {
                         _currentBulletIndex = i;
                         Shoot(fireStartPosition);
@@ -59,21 +40,20 @@ public class BulletPool : IUpdate, IDisposable
                 }
                 if (!_isFoundBullet)
                 {
-                    AddBullets();
                     Shoot(fireStartPosition);
                 }
                 _isFoundBullet = false;
             }
-            else if (!_bullets[_currentBulletIndex].BulletView.IsActive)
+            else if (!_poolObjects[_currentBulletIndex].BulletView.IsActive)
             {
                 Shoot(fireStartPosition);
             }
         }
     }
 
-    private void Shoot(Transform fireStartPosition)
+    private void Shoot(Transform fireStartPosition )
     {
-        _bullets[_currentBulletIndex].Fire(fireStartPosition);
+        _poolObjects[_currentBulletIndex].Fire(fireStartPosition);
         var time = Random.Range(_bulletData.MinDelay, _bulletData.MaxDelay);
         _timer.Init(time);
         _currentBulletIndex++;
@@ -84,16 +64,18 @@ public class BulletPool : IUpdate, IDisposable
         return ResourcesLoader.LoadAndInstantiateObject<BaseBulletView>(_prefabPath);
     }
 
-    public void Dispose()
+    private Bullet CreateNewBullet()
     {
-        _bullets.Clear();
+        var bullet = new Bullet(_bulletData.Speed, _bulletData.MaxDistance, LoadBulletView(), _bulletData.BulletColor);
+        AddToPool(bullet);
+        return bullet;
     }
 
-    public void UpdateTick()
+    public override void UpdateTick()
     {
-        for (int i = 0; i < _bullets.Count; i++)
+        for (int i = 0; i < _poolObjects.Count; i++)
         {
-            _bullets[i].Fly();
+            _poolObjects[i].Fly();
         }
         _timer.CountTime();
     }

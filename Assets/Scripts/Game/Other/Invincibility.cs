@@ -13,9 +13,12 @@ public class Invincibility
 
     public bool IsInvincible => _isInvincible;
 
-    public Invincibility(ShipView shipView)
+    public Invincibility(BaseUnitView shipView)
     {
-        _shipShapeRenderer = shipView.ShipShapeRenderer;
+        if (shipView is ShipView ship)
+        {
+            _shipShapeRenderer = ship.ShipShapeRenderer;
+        }
         _invincibletyTimer = new Timer();
         UpdatingController.SubscribeToTUpdate(CountTime);
     }

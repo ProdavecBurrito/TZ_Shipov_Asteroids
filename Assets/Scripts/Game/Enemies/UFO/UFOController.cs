@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UFOController
+public class UFOController : IUpdate
 {
     private const int RIGHT_SPAWN = 1;
     private const int LEFT_SPAWN = 0;
@@ -8,7 +8,7 @@ public class UFOController
 
     private UFOView _ufoView;
     private UFOModel _ufoModel;
-    private BulletPool _bulletPool;
+    private BasePool<Bullet> _bulletPool;
     private ScoreUI _scoreUI;
 
     private int _direction;
@@ -20,16 +20,15 @@ public class UFOController
 
     public UFOView UfoView => _ufoView;
 
-    public UFOController(BattleUnitView battleUnitView, ShipView target, BulletPool bulletPool, ScoreUI scoreUI)
+    public UFOController(BasePool<Bullet> bulletPool, ScoreUI scoreUI)
     {
-        _ufoView = (UFOView)battleUnitView;
-        _ufoView.GetTarget(target);
+        _ufoView = ResourcesLoader.LoadAndInstantiateObject<UFOView>("Prefabs/UFO");
         _ufoModel = new UFOModel();
         _bulletPool = bulletPool;
         _fifthPartOfHight = CameraFrustrum.GetFifthPartOfHight();
         _scoreUI = scoreUI;
 
-        _ufoView.OnHit += AddScore;
+        _ufoView.OnPlayerHit += AddScore;
     }
 
     public void UpdateTick()
@@ -60,8 +59,8 @@ public class UFOController
 
     private void FolowTarget()
     {
-        var direction = _ufoView.Target.position - _ufoView.ShipTransform.position;
-        var position = -(_ufoView.ShipTransform.position - _ufoView.Target.position).normalized;
+        var direction = _ufoView.Target.position - _ufoView.UnitTransform.position;
+        var position = -(_ufoView.UnitTransform.position - _ufoView.Target.position).normalized;
         var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90.0f;
         _ufoView.FireStartPosition.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         _ufoView.FireStartPosition.localPosition = position;
@@ -69,12 +68,12 @@ public class UFOController
 
     private void StartMoving(Vector2 startPosition)
     {
-        _ufoView.ShipTransform.position = startPosition;
+        _ufoView.UnitTransform.position = startPosition;
     }
 
     private void Move()
     {
-        _ufoView.ShipTransform.Translate(Vector2.right * _direction * _ufoModel.Speed * Time.deltaTime);
+        _ufoView.UnitTransform.Translate(Vector2.right * _direction * _ufoModel.Speed * Time.deltaTime);
     }
 
     private Vector2 CalculateStartPosition()
@@ -102,6 +101,6 @@ public class UFOController
 
     private void TryToShoot()
     {
-        _bulletPool.TryShoot(_ufoView.FireStartPosition);
+        _bulletPool.TryToAct(_ufoView.FireStartPosition);
     }
 }

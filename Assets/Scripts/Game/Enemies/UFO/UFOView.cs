@@ -1,18 +1,19 @@
 using UnityEngine;
 
-public class UFOView : BattleUnitView
+public class UFOView : BaseEnemyView, IBattleShip
 {
     private Transform _target;
-    private Vector3 _offset;
 
     public Transform Target => _target;
-    public Vector3 Offset => _offset;
+
+    public Transform FireStartPosition {get; set;}
 
     private void Awake()
     {
         _unitTransform = GetComponent<Transform>();
+        _target = FindObjectOfType<ShipView>().transform;
+        FireStartPosition = GetComponentInChildren<Transform>().GetChild(0);
         SetActivity(false);
-        _offset = _fireStartPositions.localPosition - _unitTransform.localPosition;
     }
 
     public void GetTarget(ShipView shipView)

@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 659f0bf880a5666488c72245d42f6c63, type: 3}
-  m_Name: PlayerShip
+  m_Script: {fileID: 11500000, guid: 5a45ef63b6329bf4dab65092050881de, type: 3}
+  m_Name: SmallAsteroid
   m_EditorClassIdentifier: 
-  MaxSpeed: 10
-  RotationSpeed: 5
-  AccelerationValue: 25
-  Health: 5
+  asteroidType: 0
+  MinSpeed: 5
+  MaxSpeed: 15
+  Score: 100

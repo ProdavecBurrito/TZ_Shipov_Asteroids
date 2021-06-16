@@ -1,30 +1,31 @@
 ﻿using System;
 using UnityEngine;
 
-public class InputController : IUpdate, IDisposable
+public class ShipController : IUpdate, IDisposable
 {
     private const int BULLET_PULL_COUNT = 15;
 
     private InputType _inputType;
     private BaseInput _baseInput;
     private ShipModel _shipModel;
-    private BattleUnitView _shipView;
+    private ShipView _shipView;
     private BulletPool _bulletPool;
     private GameMenu _gameMenuController;
     private HealthUI _healthUI;
 
-    public InputController(BattleUnitView shipView, GameMenu gameMenuController, HealthUI healthUI)
+    public ShipController(GameMenu gameMenuController, HealthUI healthUI)
     {
-        _shipView = shipView;
-        _shipModel = new ShipModel((ShipView)_shipView);
+        _shipView = ResourcesLoader.LoadAndInstantiateObject<ShipView>("Prefabs/Ship");
+        _shipModel = new ShipModel(_shipView);
         _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet", "Prefabs/PlayerBullet");
         AssignInput(PlayerPrefs.GetInt("InputSettings"));
         _gameMenuController = gameMenuController;
         _healthUI = healthUI;
+        _healthUI.GetHealth(_shipModel.Health);
 
         _shipView.OnHit += _shipModel.Hit;
         _gameMenuController.OnImputChange += ChangeInput;
-        _shipModel.OnHealthChange += _healthUI.ReduceScore;
+        _shipModel.OnHealthChange += _healthUI.ReduceHealth;
     }
 
     public void UpdateTick()
@@ -107,6 +108,6 @@ public class InputController : IUpdate, IDisposable
     {
         _shipView.OnHit -= _shipModel.Hit;
         _gameMenuController.OnImputChange -= ChangeInput;
-        _shipModel.OnHealthChange -= _healthUI.ReduceScore;
+        _shipModel.OnHealthChange -= _healthUI.ReduceHealth;
     }
 }

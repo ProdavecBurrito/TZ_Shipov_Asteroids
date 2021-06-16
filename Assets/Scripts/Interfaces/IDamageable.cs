@@ -1,4 +1,4 @@
 ﻿public interface IDamageable
 {
-    void GetDamage();
+    void GetDamage(bool isPlayerCausedDamage);
 }

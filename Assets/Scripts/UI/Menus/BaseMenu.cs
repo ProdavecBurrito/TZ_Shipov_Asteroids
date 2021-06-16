@@ -50,7 +50,7 @@ public abstract class BaseMenu : MonoBehaviour
 
     protected void LoadNewGame()
     {
-        SceneManager.LoadSceneAsync("LoadingScene", LoadSceneMode.Single);
+        SceneManager.LoadScene("Game", LoadSceneMode.Single);
     }
 
     protected virtual void InitButtons()

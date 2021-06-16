@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.U2D;
 
-public class ShipView : BattleUnitView
+public class ShipView : BaseUnitView, IBattleShip
 {
     private Vector2 _startPosition;
     private Rigidbody2D _shipRigidBody;
@@ -10,6 +10,7 @@ public class ShipView : BattleUnitView
     public SpriteShapeRenderer ShipShapeRenderer => _shipShapeRenderer;
     public Rigidbody2D ShipRigidbody => _shipRigidBody;
 
+    public Transform FireStartPosition { get; set; }
 
     private void Awake()
     {
@@ -17,11 +18,12 @@ public class ShipView : BattleUnitView
         _unitTransform = GetComponent<Transform>();
         _shipRigidBody = GetComponent<Rigidbody2D>();
         _shipShapeRenderer = GetComponent<SpriteShapeRenderer>();
+        FireStartPosition = GetComponentInChildren<Transform>().GetChild(0);
     }
 
-    public override void GetDamage()
+    public override void GetDamage(bool isPlayerCausedDamage)
     {
-        base.GetDamage();
+        base.GetDamage(isPlayerCausedDamage);
         _unitTransform.position = _startPosition;
         SetActivity(true);
     }

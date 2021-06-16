@@ -8,7 +8,7 @@ public class PlayerBulletView : BaseBulletView
         {
             if (ufo != null)
             {
-                ufo.GetDamage();
+                ufo.GetDamage(true);
             }
         }
     }
