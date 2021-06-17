@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   asteroidType: 1
   MinSpeed: 3
-  MaxSpeed: 13
+  MaxSpeed: 9
   Score: 50

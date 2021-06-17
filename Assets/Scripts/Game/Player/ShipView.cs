@@ -3,6 +3,9 @@ using UnityEngine.U2D;
 
 public class ShipView : BaseUnitView, IBattleShip
 {
+    [SerializeField] AudioSource _audioSource;
+    [SerializeField] AudioSource _accelerationAudioSource;
+
     private Vector2 _startPosition;
     private Rigidbody2D _shipRigidBody;
     private SpriteShapeRenderer _shipShapeRenderer;
@@ -11,6 +14,18 @@ public class ShipView : BaseUnitView, IBattleShip
     public Rigidbody2D ShipRigidbody => _shipRigidBody;
 
     public Transform FireStartPosition { get; set; }
+    public Vector2 StartPosition => _startPosition;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var collisionType = collision.GetComponent<BaseEnemyView>();
+        {
+            if (collisionType)
+            {
+                collisionType.GetDamage(true);
+            }
+        }
+    }
 
     private void Awake()
     {
@@ -21,10 +36,28 @@ public class ShipView : BaseUnitView, IBattleShip
         FireStartPosition = GetComponentInChildren<Transform>().GetChild(0);
     }
 
-    public override void GetDamage(bool isPlayerCausedDamage)
+    public void SetAndPlayAudioClip(AudioClip audioClip)
     {
-        base.GetDamage(isPlayerCausedDamage);
-        _unitTransform.position = _startPosition;
-        SetActivity(true);
+        _audioSource.Stop();
+        _audioSource.clip = audioClip;
+        _audioSource.Play();
+    }
+
+    public void LongPlay(AudioClip audioClip)
+    {
+        if (_accelerationAudioSource.clip == null)
+        {
+            _accelerationAudioSource.clip = audioClip;
+        }
+        if (!_accelerationAudioSource.isPlaying)
+        {
+            _accelerationAudioSource.Play();
+
+        }
+    }
+
+    public void StopPlay()
+    {
+        _accelerationAudioSource.Stop();
     }
 }

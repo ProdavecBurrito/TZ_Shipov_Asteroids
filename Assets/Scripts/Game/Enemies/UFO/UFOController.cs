@@ -1,6 +1,8 @@
 using UnityEngine;
+using System;
+using Random = UnityEngine.Random;
 
-public class UFOController : IUpdate
+public class UFOController : IUpdate, IDisposable
 {
     private const int RIGHT_SPAWN = 1;
     private const int LEFT_SPAWN = 0;
@@ -8,7 +10,9 @@ public class UFOController : IUpdate
 
     private UFOView _ufoView;
     private UFOModel _ufoModel;
-    private BasePool<Bullet> _bulletPool;
+    private BulletPool _bulletPool;
+    private AudioSource _audioSource;
+    private GameObject navigationGO;
     private ScoreUI _scoreUI;
 
     private int _direction;
@@ -24,10 +28,18 @@ public class UFOController : IUpdate
     {
         _ufoView = ResourcesLoader.LoadAndInstantiateObject<UFOView>("Prefabs/UFO");
         _ufoModel = new UFOModel();
-        _bulletPool = bulletPool;
+        _bulletPool = (BulletPool)bulletPool;
         _fifthPartOfHight = CameraFrustrum.GetFifthPartOfHight();
         _scoreUI = scoreUI;
 
+        navigationGO = new GameObject();
+        navigationGO.AddComponent(typeof(AudioSource));
+        _audioSource = navigationGO.GetComponent<AudioSource>();
+        _audioSource.volume = 0.5f;
+        _audioSource.clip = _ufoModel.ExplosionClip;
+
+        _bulletPool.OnFire += PlayFireSound;
+        _ufoView.OnHit += PlayExplosionSound;
         _ufoView.OnPlayerHit += AddScore;
     }
 
@@ -43,6 +55,7 @@ public class UFOController : IUpdate
 
     public void LaunchUFO()
     {
+        Debug.Log("A");
         _ufoView.SetActivity(true);
         StartMoving(CalculateStartPosition());
     }
@@ -69,6 +82,18 @@ public class UFOController : IUpdate
     private void StartMoving(Vector2 startPosition)
     {
         _ufoView.UnitTransform.position = startPosition;
+    }
+
+    private void PlayFireSound()
+    {
+        _audioSource.clip = _ufoModel.FireClip;
+        _audioSource.Play();
+    }
+
+    private void PlayExplosionSound()
+    {
+        _audioSource.clip = _ufoModel.ExplosionClip;
+        _audioSource.Play();
     }
 
     private void Move()
@@ -102,5 +127,12 @@ public class UFOController : IUpdate
     private void TryToShoot()
     {
         _bulletPool.TryToAct(_ufoView.FireStartPosition);
+    }
+
+    public void Dispose()
+    {
+        _bulletPool.OnFire += PlayFireSound;
+        _ufoView.OnHit += PlayExplosionSound;
+        _ufoView.OnPlayerHit += AddScore;
     }
 }

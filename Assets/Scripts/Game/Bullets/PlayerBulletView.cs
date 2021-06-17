@@ -4,11 +4,16 @@ public class PlayerBulletView : BaseBulletView
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var ufo = collision.GetComponent<UFOView>();
+        var collisionType = collision.GetComponent<BaseEnemyView>();
         {
-            if (ufo != null)
+            if (collisionType)
             {
-                ufo.GetDamage(true);
+                collisionType.GetDamage(true);
+                if (collisionType is CrackingAsteroidsView asteroidsView)
+                {
+                    asteroidsView.Crack();
+                }
+                ChangeActiveState(false);
             }
         }
     }

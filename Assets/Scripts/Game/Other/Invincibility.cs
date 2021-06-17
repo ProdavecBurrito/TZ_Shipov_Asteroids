@@ -1,6 +1,8 @@
+using UnityEngine;
 using UnityEngine.U2D;
+using System;
 
-public class Invincibility
+public class Invincibility : IUpdate, IDisposable
 {
     private const int INVINCIBILITY_FREQUENCY = 6;
     private const float INVINCIBILITY_BLINKING = 0.5f;
@@ -20,12 +22,12 @@ public class Invincibility
             _shipShapeRenderer = ship.ShipShapeRenderer;
         }
         _invincibletyTimer = new Timer();
-        UpdatingController.SubscribeToTUpdate(CountTime);
     }
 
-    private void CountTime()
+
+    public void UpdateTick()
     {
-        _invincibletyTimer.CheckFrequency();
+        CountTime();
     }
 
     public void StartInvincibility()
@@ -35,15 +37,7 @@ public class Invincibility
         _invincibletyTimer.OnFrequencyEnd += EndInvincibility;
     }
 
-    private void EndInvincibility()
-    {
-        SetInvincibility(false);
-        _shipShapeRenderer.enabled = true;
-        _invincibletyTimer.OnFrequencyEnd -= EndInvincibility;
-
-    }
-
-    public void SetInvincibility(bool isInvincible)
+    private void SetInvincibility(bool isInvincible)
     {
         _isInvincible = isInvincible;
         if (isInvincible)
@@ -56,7 +50,7 @@ public class Invincibility
         }
     }
 
-    public void Blink()
+    private void Blink()
     {
         if (_shipShapeRenderer.enabled)
         {
@@ -66,5 +60,22 @@ public class Invincibility
         {
             _shipShapeRenderer.enabled = true;
         }
+    }
+
+    private void CountTime()
+    {
+        _invincibletyTimer.CheckFrequency();
+    }
+
+    private void EndInvincibility()
+    {
+        SetInvincibility(false);
+        _shipShapeRenderer.enabled = true;
+        _invincibletyTimer.OnFrequencyEnd -= EndInvincibility;
+    }
+
+    public void Dispose()
+    {
+        _invincibletyTimer.OnFrequencyEnd -= EndInvincibility;
     }
 }

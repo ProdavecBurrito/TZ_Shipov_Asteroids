@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class BulletPool : BasePool<Bullet>, IUpdate
 {
+    public event Action OnFire = delegate () { };
+
     private BulletData _bulletData;
     private bool _isFoundBullet;
     private int _currentBulletIndex;
@@ -40,6 +43,7 @@ public class BulletPool : BasePool<Bullet>, IUpdate
                 }
                 if (!_isFoundBullet)
                 {
+                    CreateNewBullet();
                     Shoot(fireStartPosition);
                 }
                 _isFoundBullet = false;
@@ -57,6 +61,7 @@ public class BulletPool : BasePool<Bullet>, IUpdate
         var time = Random.Range(_bulletData.MinDelay, _bulletData.MaxDelay);
         _timer.Init(time);
         _currentBulletIndex++;
+        OnFire.Invoke();
     }
 
     private BaseBulletView LoadBulletView()

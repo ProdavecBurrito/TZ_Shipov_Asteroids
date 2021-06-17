@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Speed: 5
   Score: 200
-  MinSpawnTime: 2
-  MaxSpawnTime: 4
+  MinSpawnTime: 20
+  MaxSpawnTime: 41

@@ -8,6 +8,15 @@ public class UFOView : BaseEnemyView, IBattleShip
 
     public Transform FireStartPosition {get; set;}
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var collisionType = GetComponent<BaseUnitView>();
+        if (collisionType is ShipView || collisionType is AsteroidView)
+        {
+            collisionType.GetDamage(false);
+        }
+    }
+
     private void Awake()
     {
         _unitTransform = GetComponent<Transform>();

@@ -19,7 +19,6 @@ public class BaseUnitView : MonoBehaviour, IDamageable
 
     public virtual void GetDamage(bool isPlayerCausedDamage)
     {
-        SetActivity(false);
         OnHit.Invoke();
     }
 }

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class Asteroid
 {
-    private float _startPosition;
     private BaseEnemyView _asteroidView;
 
     private float _speed;

@@ -1,10 +1,12 @@
-using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
 
 public class AsteroidController : IUpdate, IDisposable
 {
+    public event Action<Transform> OnCrack = delegate (Transform transform) { };
+    public event Action<Asteroid> OnCreation = delegate (Asteroid asteroid) { };
+
     private const int TOP_SPAWN = 2;
     private const int RIGHT_SPAWN = 2;
     private const int BOT_SPAWN = 0;
@@ -13,26 +15,38 @@ public class AsteroidController : IUpdate, IDisposable
 
     private AsteroidPool _asteroidPool;
     private BaseAsteroidModel _asteroidModel;
-    private List<float> _asteroidsSpeed;
     private ScoreUI _scoreUI;
+    private GameObject navigationGO;
+    private AudioSource _audioSource;
 
-    private int _direction;
     private float _hight;
     private float _width;
 
-    public BaseAsteroidModel AsteroidModel => _asteroidModel;
+    public AsteroidPool AsteroidPool => _asteroidPool;
 
     public AsteroidController(ScoreUI scoreUI, string asteroidPrefabPath, int count, BaseAsteroidModel asteroidModel)
     {
         _scoreUI = scoreUI;
-        _asteroidsSpeed = new List<float>();
         _asteroidModel = asteroidModel;
         _asteroidPool = new AsteroidPool(count, _asteroidModel, asteroidPrefabPath);
+        navigationGO = new GameObject();
+        navigationGO.AddComponent(typeof(AudioSource));
+        _audioSource = navigationGO.GetComponent<AudioSource>();
+        _audioSource.volume = 0.5f;
+        _audioSource.clip = _asteroidModel.ExplosionClip;
+
+        _asteroidPool.OnCreation += OnAsteroidCreation;
 
         foreach (var item in _asteroidPool.PollObjects)
         {
             item.AsteroidView.OnPlayerHit += AddScore;
+            item.AsteroidView.OnHit += PlayExplosionSound;
+            if (item.AsteroidView is CrackingAsteroidsView asteroidsView)
+            {
+                asteroidsView.OnCrack += OnAsteroidCrack;
+            }
         }
+
     }
 
     public void UpdateTick()
@@ -40,23 +54,45 @@ public class AsteroidController : IUpdate, IDisposable
         _asteroidPool.UpdateTick();
     }
 
-    public void AddScore()
+    public void StartMoving()
+    {
+        navigationGO.transform.position = CalculateStartPosition();
+        navigationGO.transform.rotation = CalculateRotation();
+        _asteroidPool.TryToAct(navigationGO.transform);
+    }
+
+    public void StartMoving(Transform startPosition, float rotationValue)
+    {
+        navigationGO.transform.position = startPosition.position;
+        navigationGO.transform.rotation = CalculateRotation(startPosition, rotationValue);
+        _asteroidPool.TryToAct(navigationGO.transform);
+    }
+
+    public bool IsPoolActive()
+    {
+        return _asteroidPool.CheckAstivity();
+    }
+
+    private void PlayExplosionSound()
+    {
+        _audioSource.Play();
+    }
+
+    private void AddScore()
     {
         _scoreUI.AddScore(_asteroidModel.Score);
     }
 
-    private void StartMoving()
-    {
-        var navigationGO = new GameObject();
-        navigationGO.transform.position = CalculateStartPosition();
-        navigationGO.transform.rotation.SetLookRotation(CalculateRotation());
-        _asteroidPool.TryToAct(navigationGO.transform);
-    }
-
-    private Vector3 CalculateRotation()
+    private Quaternion CalculateRotation()
     {
         var randomRotation = Random.Range(-360, 361);
-        var rotationVector = new Vector3(0, 0, randomRotation);
+        var rotationVector = Quaternion.Euler(0, 0, randomRotation);
+        return rotationVector;
+    }
+
+    private Quaternion CalculateRotation(Transform transform, float rotationValue)
+    {
+        var rotationVector = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + rotationValue);
         return rotationVector;
     }
 
@@ -83,21 +119,39 @@ public class AsteroidController : IUpdate, IDisposable
 
             if (spawnHight == TOP_SPAWN)
             {
-                _width = CameraFrustrum.CalculateHight() / HALF_VALUE;
+                _hight = CameraFrustrum.CalculateHight() / HALF_VALUE;
             }
             else
             {
-                _width = -CameraFrustrum.CalculateHight() / HALF_VALUE;
+                _hight = -CameraFrustrum.CalculateHight() / HALF_VALUE;
             }
         }
         return new Vector2(_width, _hight);
     }
 
+    private void OnAsteroidCreation(Asteroid asteroid)
+    {
+        if (asteroid.AsteroidView is CrackingAsteroidsView crackingAsteroid)
+        {
+            crackingAsteroid.OnCrack += OnAsteroidCrack;
+        }
+    }
+
+    private void OnAsteroidCrack(Transform startPosition)
+    {
+        OnCrack.Invoke(startPosition);
+    }
+
     public void Dispose()
     {
+        _asteroidPool.OnCreation -= OnAsteroidCreation;
         foreach (var item in _asteroidPool.PollObjects)
         {
             item.AsteroidView.OnPlayerHit -= AddScore;
+            if (item.AsteroidView is CrackingAsteroidsView asteroidsView)
+            {
+                asteroidsView.OnCrack -= OnAsteroidCrack;
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class BaseEnemyView : BaseUnitView
 {
     public event Action OnPlayerHit = delegate () { };
-
+    
     private void Awake()
     {
         _unitTransform = GetComponent<Transform>();
@@ -14,6 +14,7 @@ public class BaseEnemyView : BaseUnitView
     public override void GetDamage(bool isPlayerCausedDamage)
     {
         base.GetDamage(isPlayerCausedDamage);
+        SetActivity(false);
         if (isPlayerCausedDamage)
         {
             GetDamageFromPlayer();

@@ -1,7 +1,11 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class AsteroidPool : BasePool<Asteroid>
 {
+    public event Action<Asteroid> OnCreation = delegate (Asteroid asteroid) { };
+
     private BaseAsteroidModel _asteroidModel;
     private bool _isFoundAsteroid;
     private string _prefabPath;
@@ -14,6 +18,26 @@ public class AsteroidPool : BasePool<Asteroid>
         for (int i = 0; i < count; i++)
         {
             CreateNewAsteroid();
+        }
+    }
+
+    public bool CheckAstivity()
+    {
+        for (int i = 0; i < _poolObjects.Count; i++)
+        {
+            if (_poolObjects[i].AsteroidView.IsActive)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public override void UpdateTick()
+    {
+        for (int i = 0; i < _poolObjects.Count; i++)
+        {
+            _poolObjects[i].Fly();
         }
     }
 
@@ -33,6 +57,7 @@ public class AsteroidPool : BasePool<Asteroid>
             }
             if (!_isFoundAsteroid)
             {
+                CreateNewAsteroid();
                 Launch(startPosition);
             }
         _isFoundAsteroid = false;
@@ -47,26 +72,20 @@ public class AsteroidPool : BasePool<Asteroid>
     {
         _poolObjects[_currentObjectIndex].LaunchAsteroid(startPosition);
         var speed = Random.Range(_asteroidModel.MinSpeed, _asteroidModel.MaxSpeed);
+        _poolObjects[_currentObjectIndex].AssignSpeed(speed);
         _currentObjectIndex++;
     }
 
     private BaseEnemyView LoadAsteroidView()
     {
-        return ResourcesLoader.LoadAndInstantiateObject<BaseEnemyView>(_prefabPath);
+        return ResourcesLoader.LoadAndInstantiateObject<AsteroidView>(_prefabPath);
     }
 
     private Asteroid CreateNewAsteroid()
     {
         var asteroid = new Asteroid(LoadAsteroidView());
         AddToPool(asteroid);
+        OnCreation.Invoke(asteroid);
         return asteroid;
-    }
-
-    public override void UpdateTick()
-    {
-        for (int i = 0; i < _poolObjects.Count; i++)
-        {
-            _poolObjects[i].Fly();
-        }
     }
 }

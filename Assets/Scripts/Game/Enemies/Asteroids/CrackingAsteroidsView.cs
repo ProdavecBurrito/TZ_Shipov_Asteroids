@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class CrackingAsteroidsView : BaseEnemyView
+public class CrackingAsteroidsView : AsteroidView
 {
-    public event Action OnCrack = delegate () { };
+    public event Action<Transform> OnCrack = delegate (Transform transform) { };
 
     private void Awake()
     {
@@ -11,12 +11,8 @@ public class CrackingAsteroidsView : BaseEnemyView
         SetActivity(false);
     }
 
-    public override void GetDamage(bool isPlayerCausedDamage)
+    public void Crack()
     {
-        base.GetDamage(isPlayerCausedDamage);
-        if (isPlayerCausedDamage)
-        {
-            OnCrack.Invoke();
-        }
+        OnCrack.Invoke(UnitTransform);
     }
 }

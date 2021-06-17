@@ -25,6 +25,6 @@ public class KeyboardPlusMouseInput : BaseInput
     {
         var direction = Input.mousePosition - Camera.main.WorldToScreenPoint(_movingBody.transform.position);
         var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90.0f;
-        _movingBody.transform.rotation = Quaternion.Lerp(_movingBody.transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), rotationSpeed * Time.deltaTime);
+        _movingBody.transform.rotation = Quaternion.Lerp(_movingBody.transform.rotation, Quaternion.AngleAxis(angle, Vector3.forward), rotationSpeed * Time.fixedDeltaTime);
     }
 }

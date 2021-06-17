@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: BigAsteroid
   m_EditorClassIdentifier: 
   asteroidType: 2
-  MinSpeed: 2
-  MaxSpeed: 12
+  MinSpeed: 3
+  MaxSpeed: 6
   Score: 20
