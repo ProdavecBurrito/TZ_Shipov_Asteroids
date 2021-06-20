@@ -8,7 +8,7 @@ public class UFOBilletView : BaseBulletView
         {
             if (playerShip != null)
             {
-                playerShip.GetDamage(false);
+                playerShip.GetDamage();
             }
         }
     }

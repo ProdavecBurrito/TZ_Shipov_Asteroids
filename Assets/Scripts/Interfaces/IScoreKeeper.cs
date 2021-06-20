@@ -2,5 +2,7 @@
 
 public interface IScoreKeeper
 {
-    public int Score { get; set; }
+    public event Action OnPlayerHit;
+
+    public abstract void GiveScore();
 }

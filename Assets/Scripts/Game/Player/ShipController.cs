@@ -1,86 +1,137 @@
 ﻿using System;
 using UnityEngine;
 
-public class ShipController : IUpdate, IDisposable
+public class ShipController : IUpdate, IFixedUpdate, IDisposable
 {
     public event Action OnHitTrue = delegate () { };
 
     private const int BULLET_PULL_COUNT = 15;
 
     private InputType _inputType;
-    private BaseInput _baseInput;
+
+    private BaseInput _currentInput;
+    private KeyboardPlusMouseInput _keyboardPlusMouseInput;
+    private KeyboardInput _keyboardInput;
+
     private ShipModel _shipModel;
     private ShipView _shipView;
     private BulletPool _bulletPool;
     private GameMenu _gameMenuController;
+    private GameOverMenu _gameOver;
     private HealthUI _healthUI;
     private Invincibility _invincibility;
 
+    private bool IsMoving;
+    private bool IsRotating;
+
     public ShipModel ShipModel => _shipModel;
 
-    public ShipController(GameMenu gameMenuController, HealthUI healthUI)
+    public ShipController(GameMenu gameMenuController, GameOverMenu gameOverMenu, IUIValue healthUI)
     {
+
         _shipView = ResourcesLoader.LoadAndInstantiateObject<ShipView>("Prefabs/Ship");
         _invincibility = new Invincibility(_shipView);
         _shipModel = new ShipModel(_shipView);
+        _keyboardPlusMouseInput = new KeyboardPlusMouseInput(_shipView.ShipRigidbody);
+        _keyboardInput = new KeyboardInput(_shipView.ShipRigidbody);
+
         _bulletPool = new BulletPool(BULLET_PULL_COUNT, "Data/PlayerBullet", "Prefabs/PlayerBullet");
         AssignInput(PlayerPrefs.GetInt("InputSettings"));
         _gameMenuController = gameMenuController;
-        _healthUI = healthUI;
-        _healthUI.GetHealth(_shipModel.Health);
+        _gameOver = gameOverMenu;
+        _healthUI = (HealthUI)healthUI;
+        _healthUI.ManageValue(_shipModel.Health);
+        LockInput(false);
 
         OnHitTrue += _shipModel.Hit;
         _shipView.OnHit += GetHit;
         _gameMenuController.OnImputChange += ChangeInput;
+        _gameMenuController.OnMenuActive += LockInput;
+        _gameOver.OnMenuActive += LockInput;
         _shipModel.OnHealthChange += _healthUI.ReduceHealth;
-        _bulletPool.OnFire += PlayFireSount;
+        _bulletPool.OnFire += PlayFireSound;
+
     }
 
+    public void FixedUpdateTick()
+    {
+        Move();
+        Rotate();
+    }
     public void UpdateTick()
     {
-        AddAcceleration(_shipModel.AccelerationValue);
-        AddRotation(_shipModel.RotationSpeed);
-        Shoot();
+        CheckInputLock();
         OpenMenu();
         _invincibility.UpdateTick();
         _bulletPool.UpdateTick();
     }
 
-    private void OpenMenu()
+    private void CheckInputLock()
     {
-        _baseInput.OpenMenu(_gameMenuController);
+        if (!_currentInput.IsLocked)
+        {
+            AddAcceleration();
+            AddRotation();
+            Shoot();
+        }
     }
 
-    private void AddAcceleration(float value)
+    private void OpenMenu()
     {
-        if (_baseInput.IsMoving())
+        _currentInput.OpenMenu(_gameMenuController);
+    }
+
+    private void AddAcceleration()
+    {
+        if (_currentInput.IsMoving())
         {
-            _baseInput.Move(_shipModel.AccelerationValue, _shipModel.MaxSpeed);
             _shipView.LongPlay(_shipModel.AccelerationSound);
+            IsMoving = true;
         }
         else
         {
             _shipView.StopPlay();
+            IsMoving = false;
         }
     }
 
-    private void AddRotation(float value)
+    private void Move()
     {
-        if(_baseInput.IsRotating())
+        if (IsMoving)
         {
-            _baseInput.Rotate(value);
+            _currentInput.Move(_shipModel.AccelerationValue, _shipModel.MaxSpeed);
+        }
+    }
+
+    private void AddRotation()
+    {
+        if(_currentInput.IsRotating())
+        {
+            IsRotating = true;
+        }
+        else
+        {
+            IsRotating = false;
+        }
+    }
+
+    private void Rotate()
+    {
+        if (IsRotating)
+        {
+            _currentInput.Rotate(_shipModel.RotationSpeed);
         }
     }
 
     private void Shoot()
     {
-        if (_baseInput.IsShooting())
+        if (_currentInput.IsShooting())
         {
-            _baseInput.Shoot(_bulletPool, _shipView.FireStartPosition);
+            _currentInput.Shoot(_bulletPool, _shipView.FireStartPosition);
         }
     }
 
-    private void PlayFireSount()
+    private void PlayFireSound()
     {
         _shipView.SetAndPlayAudioClip(_shipModel.FireSound);
     }
@@ -92,46 +143,46 @@ public class ShipController : IUpdate, IDisposable
             _shipView.SetAndPlayAudioClip(_shipModel.DieSound);
             _shipView.UnitTransform.position = _shipView.StartPosition;
             _invincibility.StartInvincibility();
+            _shipView.ShipRigidbody.velocity = Vector2.zero;
             OnHitTrue.Invoke();
         }
     }
 
     private void AssignInput(int inputData)
     {
-        if (_shipView is ShipView shipView)
+        switch (inputData)
         {
-            switch (inputData)
-            {
-                case 0:
-                    _baseInput = new KeyboardInput(shipView.ShipRigidbody);
-                    _inputType = InputType.Keyboard;
-                    break;
-                case 1:
-                    _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
-                    _inputType = InputType.KeyboardPlusMouse;
-                    break;
-            }
+            case 0:
+                _currentInput = _keyboardInput;
+                _inputType = InputType.Keyboard;
+                break;
+            case 1:
+                _currentInput = _keyboardPlusMouseInput;
+                _inputType = InputType.KeyboardPlusMouse;
+                break;
         }
     }
 
     private void ChangeInput()
     {
-        if (_shipView is ShipView shipView)
+        switch (_inputType)
         {
-            switch (_inputType)
-            {
-                case InputType.Keyboard:
-                    _baseInput = new KeyboardPlusMouseInput(shipView.ShipRigidbody);
-                    _inputType = InputType.KeyboardPlusMouse;
-                    Debug.Log("A");
-                    break;
-                case InputType.KeyboardPlusMouse:
-                    _baseInput = new KeyboardInput(shipView.ShipRigidbody);
-                    _inputType = InputType.Keyboard;
-                    Debug.Log("B");
-                    break;
-            }
+            case InputType.Keyboard:
+                _currentInput = _keyboardPlusMouseInput;
+                LockInput(true);
+                _inputType = InputType.KeyboardPlusMouse;
+                break;
+            case InputType.KeyboardPlusMouse:
+                _currentInput = _keyboardInput;
+                LockInput(true);
+                _inputType = InputType.Keyboard;
+                break;
         }
+    }
+
+    private void LockInput(bool isLocked)
+    {
+        _currentInput.LockInput(isLocked);
     }
 
     public void Dispose()
@@ -139,7 +190,9 @@ public class ShipController : IUpdate, IDisposable
         OnHitTrue -= _shipModel.Hit;
         _shipView.OnHit -= GetHit;
         _gameMenuController.OnImputChange -= ChangeInput;
+        _gameMenuController.OnMenuActive -= _currentInput.LockInput;
+        _gameOver.OnMenuActive -= _currentInput.LockInput;
         _shipModel.OnHealthChange -= _healthUI.ReduceHealth;
-        _bulletPool.OnFire -= PlayFireSount;
+        _bulletPool.OnFire -= PlayFireSound;
     }
 }

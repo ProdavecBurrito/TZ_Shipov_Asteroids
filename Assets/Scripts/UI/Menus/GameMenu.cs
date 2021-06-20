@@ -3,9 +3,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameMenu : BaseMenu
+public class GameMenu : BaseMenu, IInputLockMenu
 {
     public event Action OnImputChange = delegate () { };
+    public event Action<bool> OnMenuActive = delegate (bool isActive) { };
 
     [SerializeField] private Button _continue;
 
@@ -20,11 +21,13 @@ public class GameMenu : BaseMenu
     private void OnEnable()
     {
         Time.timeScale = 0;
+        OnMenuActive.Invoke(true);
     }
 
     private void OnDisable()
     {
         Time.timeScale = 1;
+        OnMenuActive.Invoke(false);
     }
 
     private void Continue()

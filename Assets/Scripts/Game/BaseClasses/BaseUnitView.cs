@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BaseUnitView : MonoBehaviour, IDamageable
+public class BaseUnitView : MonoBehaviour
 {
     public event Action OnHit = delegate () { };
 
@@ -17,7 +17,7 @@ public class BaseUnitView : MonoBehaviour, IDamageable
         _unitTransform.gameObject.SetActive(isActive); 
     }
 
-    public virtual void GetDamage(bool isPlayerCausedDamage)
+    public virtual void GetDamage()
     {
         OnHit.Invoke();
     }

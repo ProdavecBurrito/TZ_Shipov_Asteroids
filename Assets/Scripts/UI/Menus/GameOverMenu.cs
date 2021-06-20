@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameOverMenu : MonoBehaviour
+public class GameOverMenu : MonoBehaviour, IInputLockMenu
 {
     [SerializeField] protected Button _newGame;
     [SerializeField] protected Button _exit;
+
+    public event Action<bool> OnMenuActive = delegate (bool isActive) { };
 
     private void Awake()
     {
@@ -15,11 +18,13 @@ public class GameOverMenu : MonoBehaviour
     private void OnEnable()
     {
         Time.timeScale = 0;
+        OnMenuActive.Invoke(true);
     }
 
     private void OnDisable()
     {
         Time.timeScale = 1;
+        OnMenuActive.Invoke(false);
     }
 
     protected void ExitGame()

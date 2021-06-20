@@ -18,7 +18,7 @@ public class KeyboardPlusMouseInput : BaseInput
 
     public override bool IsShooting()
     {
-        return base.IsShooting() || Input.GetMouseButton(0);
+        return base.IsShooting() || Input.GetMouseButtonDown(0);
     }
 
     public override void Rotate(float rotationSpeed)

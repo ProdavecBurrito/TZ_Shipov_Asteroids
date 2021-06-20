@@ -1,4 +1,3 @@
-using UnityEngine;
 using UnityEngine.U2D;
 using System;
 

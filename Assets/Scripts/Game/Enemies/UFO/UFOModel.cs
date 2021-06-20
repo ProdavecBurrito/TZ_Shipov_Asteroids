@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class UFOModel : IScoreKeeper
+public class UFOModel 
 {
     private UFOData _ufoData;
     private AudioClip _explosionClip;

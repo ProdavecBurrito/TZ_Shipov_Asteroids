@@ -35,15 +35,15 @@ public class Border : MonoBehaviour
         {
             collider.transform.position = new Vector2(_leftBorder + 1, collider.transform.position.y);
         }
-        else if (collider.transform.position.x <= _leftBorder)
+        if (collider.transform.position.x <= _leftBorder)
         {
             collider.transform.position = new Vector2(_rightBorder - 1, collider.transform.position.y);
         }
-        else if (collider.transform.position.y >= _topBorder)
+        if (collider.transform.position.y >= _topBorder)
         {
             collider.transform.position = new Vector2(collider.transform.position.x, _botRorder + 1);
         }
-        else if (collider.transform.position.y <= _botRorder)
+        if (collider.transform.position.y <= _botRorder)
         {
             collider.transform.position = new Vector2(collider.transform.position.x, _topBorder - 1);
         }

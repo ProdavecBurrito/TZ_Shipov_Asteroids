@@ -1,21 +1,21 @@
 using UnityEngine;
 using TMPro;
 
-public class ScoreUI : MonoBehaviour
+public class ScoreUI : MonoBehaviour, IUIValue
 {
-    [SerializeField] private TMP_Text _scoreText;
+    [SerializeField] public TMP_Text ValueText { get; private set; }
 
-    private int _score;
+    public int Value { get; private set ; }
 
     private void Awake()
     {
-        _score = 0;
-        _scoreText = GetComponentInChildren<TMP_Text>();
+        Value = 0;
+        ValueText = GetComponentInChildren<TMP_Text>();
     }
 
-    public void AddScore(int value)
+    public void ManageValue(int newValue)
     {
-        _score += value;
-        _scoreText.text = $"Score: {_score}";
+        Value += newValue;
+        ValueText.text = $"Score: {Value}";
     }
 }

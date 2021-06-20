@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 659f0bf880a5666488c72245d42f6c63, type: 3}
   m_Name: PlayerShip
   m_EditorClassIdentifier: 
-  MaxSpeed: 50
+  MaxSpeed: 10
   RotationSpeed: 5
-  AccelerationValue: 100
+  AccelerationValue: 200
   Health: 3

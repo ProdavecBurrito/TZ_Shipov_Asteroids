@@ -18,12 +18,13 @@ public class GameController : MonoBehaviour
         _healthUI = GetComponentInChildren<HealthUI>();
         _scoreUI = GetComponentInChildren<ScoreUI>();
 
-        _shipController = new ShipController(_gameMenu, _healthUI);
+        _shipController = new ShipController(_gameMenu, _gameOverMenu, _healthUI);
         _ufoSpawnController = new UFOSpawnController(_scoreUI);
         _asteroidSpawnController = new AsteroidSpawnController(_scoreUI);
 
         _shipController.ShipModel.OnDie += GameOver;
 
+        UpdatingController.AddToFixedUpdate(_shipController);
         UpdatingController.AddToUpdate(_ufoSpawnController);
         UpdatingController.AddToUpdate(_shipController);
         UpdatingController.AddToUpdate(_asteroidSpawnController);
@@ -56,5 +57,7 @@ public class GameController : MonoBehaviour
     private void OnDestroy()
     {
         UpdatingController.RemoveAllFromUpdate();
+        UpdatingController.RemoveAllFromFixedUpdate();
+        _shipController.ShipModel.OnDie -= GameOver;
     }
 }

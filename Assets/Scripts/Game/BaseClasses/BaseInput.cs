@@ -3,6 +3,8 @@
 public abstract class BaseInput
 {
     protected Rigidbody2D _movingBody;
+    private bool _isLocked;
+    public bool IsLocked => _isLocked;
 
     public BaseInput(Rigidbody2D rigidbody2D)
     {
@@ -25,7 +27,8 @@ public abstract class BaseInput
     public void Move(float acceleration, float maxSpeed)
     {
         _movingBody.AddRelativeForce(-Vector2.up * acceleration * Time.fixedDeltaTime, ForceMode2D.Force);
-        _movingBody.velocity = Vector3.ClampMagnitude(_movingBody.velocity, maxSpeed);
+
+        _movingBody.velocity = Vector2.ClampMagnitude(_movingBody.velocity, maxSpeed);
     }
 
     public virtual bool IsShooting()
@@ -41,4 +44,9 @@ public abstract class BaseInput
     public abstract bool IsRotating();
 
     public abstract void Rotate(float rotationSpeed);
+
+    public void LockInput(bool isLock)
+    {
+        _isLocked = isLock;
+    }
 }

@@ -13,7 +13,7 @@ public class ShipView : BaseUnitView, IBattleShip
     public SpriteShapeRenderer ShipShapeRenderer => _shipShapeRenderer;
     public Rigidbody2D ShipRigidbody => _shipRigidBody;
 
-    public Transform FireStartPosition { get; set; }
+    public Transform FireStartPosition { get; private set; }
     public Vector2 StartPosition => _startPosition;
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -22,7 +22,11 @@ public class ShipView : BaseUnitView, IBattleShip
         {
             if (collisionType)
             {
-                collisionType.GetDamage(true);
+                collisionType.GetDamage();
+            }
+            if (collisionType is IScoreKeeper)
+            {
+                collisionType.GiveScore();
             }
         }
     }

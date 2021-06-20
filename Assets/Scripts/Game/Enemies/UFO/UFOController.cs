@@ -2,11 +2,12 @@ using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
 
-public class UFOController : IUpdate, IDisposable
+public class UFOController : IUpdate, ISpawner, IDisposable
 {
     private const int RIGHT_SPAWN = 1;
     private const int LEFT_SPAWN = 0;
     private const int HALF_VALUE = 2;
+    private const float ROTATION_ÑOMPENSATION = 90.0f;
 
     private UFOView _ufoView;
     private UFOModel _ufoModel;
@@ -16,21 +17,22 @@ public class UFOController : IUpdate, IDisposable
     private ScoreUI _scoreUI;
 
     private int _direction;
-    private float _hight;
-    private float _width;
     private float _fifthPartOfHight;
 
     public UFOModel UfoModel => _ufoModel;
 
     public UFOView UfoView => _ufoView;
 
-    public UFOController(BasePool<Bullet> bulletPool, ScoreUI scoreUI)
+    public float SpawnHight { get ; private set ; }
+    public float SpawnWidth { get; private set; }
+
+    public UFOController(BasePool<Bullet> bulletPool, IUIValue scoreUI)
     {
         _ufoView = ResourcesLoader.LoadAndInstantiateObject<UFOView>("Prefabs/UFO");
         _ufoModel = new UFOModel();
         _bulletPool = (BulletPool)bulletPool;
         _fifthPartOfHight = CameraFrustrum.GetFifthPartOfHight();
-        _scoreUI = scoreUI;
+        _scoreUI = (ScoreUI)scoreUI;
 
         navigationGO = new GameObject();
         navigationGO.AddComponent(typeof(AudioSource));
@@ -50,14 +52,36 @@ public class UFOController : IUpdate, IDisposable
 
     public void AddScore()
     {
-        _scoreUI.AddScore(_ufoModel.Score);
+        _scoreUI.ManageValue(_ufoModel.Score);
     }
 
     public void LaunchUFO()
     {
-        Debug.Log("A");
         _ufoView.SetActivity(true);
         StartMoving(CalculateStartPosition());
+    }
+
+    public Vector2 CalculateStartPosition()
+    {
+        SpawnHight = Random.Range(-CameraFrustrum.CalculateHight() / HALF_VALUE + _fifthPartOfHight, CameraFrustrum.CalculateHight() / HALF_VALUE - _fifthPartOfHight);
+        var spawnWidth = Random.Range(LEFT_SPAWN, RIGHT_SPAWN + 1);
+        if (spawnWidth == RIGHT_SPAWN)
+        {
+            SpawnWidth = CameraFrustrum.CalculateWidth() / HALF_VALUE;
+        }
+        else
+        {
+            SpawnWidth = -CameraFrustrum.CalculateWidth() / HALF_VALUE;
+        }
+        if (SpawnWidth > CameraFrustrum.CalculateHight() / HALF_VALUE)
+        {
+            _direction = -1;
+        }
+        else
+        {
+            _direction = 1;
+        }
+        return new Vector2(SpawnWidth, SpawnHight);
     }
 
     private void ExecuteUpdate()
@@ -74,7 +98,7 @@ public class UFOController : IUpdate, IDisposable
     {
         var direction = _ufoView.Target.position - _ufoView.UnitTransform.position;
         var position = -(_ufoView.UnitTransform.position - _ufoView.Target.position).normalized;
-        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + 90.0f;
+        var angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg + ROTATION_ÑOMPENSATION;
         _ufoView.FireStartPosition.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         _ufoView.FireStartPosition.localPosition = position;
     }
@@ -99,29 +123,6 @@ public class UFOController : IUpdate, IDisposable
     private void Move()
     {
         _ufoView.UnitTransform.Translate(Vector2.right * _direction * _ufoModel.Speed * Time.deltaTime);
-    }
-
-    private Vector2 CalculateStartPosition()
-    {
-        _hight = Random.Range(-CameraFrustrum.CalculateHight() / HALF_VALUE + _fifthPartOfHight, CameraFrustrum.CalculateHight() / HALF_VALUE - _fifthPartOfHight);
-        var spawnWidth = Random.Range(LEFT_SPAWN, RIGHT_SPAWN + 1);
-        if (spawnWidth == RIGHT_SPAWN)
-        {
-            _width = CameraFrustrum.CalculateWidth() / HALF_VALUE;
-        }
-        else
-        {
-            _width = -CameraFrustrum.CalculateWidth() / HALF_VALUE;
-        }
-        if (_width > CameraFrustrum.CalculateHight() / HALF_VALUE)
-        {
-            _direction = -1;
-        }
-        else
-        {
-            _direction = 1;
-        }
-        return new Vector2(_width, _hight);
     }
 
     private void TryToShoot()

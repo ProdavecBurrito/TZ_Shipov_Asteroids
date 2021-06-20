@@ -1,32 +1,33 @@
 using TMPro;
 using UnityEngine;
 
-public class HealthUI : MonoBehaviour
+public class HealthUI : MonoBehaviour, IUIValue
 {
     [SerializeField] private TMP_Text _healthText;
 
-    private int _health;
+    public int Value { get; private set; }
+    public TMP_Text ValueText { get; private set ; }
 
     private void Awake()
     {
-        _health = 3;
+        Value = 3;
         _healthText = GetComponentInChildren<TMP_Text>();
-    }
-
-    public void GetHealth(int healthValue)
-    {
-        _health = healthValue;
-        ChangeHealthText();
     }
 
     public void ReduceHealth()
     {
-        _health--;
+        Value--;
         ChangeHealthText();
     }
 
     private void ChangeHealthText()
     {
-        _healthText.text = $"Health: {_health}";
+        _healthText.text = $"Health: {Value}";
+    }
+
+    public void ManageValue(int newValue)
+    {
+        Value = newValue;
+        ChangeHealthText();
     }
 }

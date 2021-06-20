@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class BaseEnemyView : BaseUnitView
+public class BaseEnemyView : BaseUnitView, IScoreKeeper
 {
     public event Action OnPlayerHit = delegate () { };
     
@@ -11,17 +11,13 @@ public class BaseEnemyView : BaseUnitView
         SetActivity(false);
     }
 
-    public override void GetDamage(bool isPlayerCausedDamage)
+    public override void GetDamage()
     {
-        base.GetDamage(isPlayerCausedDamage);
+        base.GetDamage();
         SetActivity(false);
-        if (isPlayerCausedDamage)
-        {
-            GetDamageFromPlayer();
-        }
     }
 
-    protected virtual void GetDamageFromPlayer()
+    public void GiveScore()
     {
         OnPlayerHit.Invoke();
     }

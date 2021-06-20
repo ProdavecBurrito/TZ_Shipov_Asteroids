@@ -14,7 +14,7 @@ public class AsteroidView : BaseEnemyView
         {
             if (collisionType is ShipView || collisionType is UFOView)
             {
-                collisionType.GetDamage(false);
+                collisionType.GetDamage();
             }
         }
     }

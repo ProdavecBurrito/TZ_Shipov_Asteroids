@@ -8,10 +8,14 @@ public class PlayerBulletView : BaseBulletView
         {
             if (collisionType)
             {
-                collisionType.GetDamage(true);
+                collisionType.GetDamage();
                 if (collisionType is CrackingAsteroidsView asteroidsView)
                 {
                     asteroidsView.Crack();
+                }
+                if (collisionType is IScoreKeeper scoreKeeper)
+                {
+                    scoreKeeper.GiveScore();
                 }
                 ChangeActiveState(false);
             }

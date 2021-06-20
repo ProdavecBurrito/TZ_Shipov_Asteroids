@@ -61,7 +61,6 @@ public class AsteroidSpawnController : BaseSpawner<List<AsteroidController>>
 
     public override void CalculateTimeToSpawn()
     {
-        Debug.Log("1");
         _spawnTimer.Init(_spawnTimeData.Time);
         _spawnTimer.OnEndCountDown += SpawnAsteroids;
     }
@@ -99,7 +98,6 @@ public class AsteroidSpawnController : BaseSpawner<List<AsteroidController>>
         }
         _currentAsteroidCount++;
         _spawnTimer.OnEndCountDown -= SpawnAsteroids;
-        Debug.Log(_currentAsteroidCount);
     }
 
     private void SpawnSpecificAsteroid(int asteroidType)

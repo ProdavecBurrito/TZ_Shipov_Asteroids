@@ -2,5 +2,5 @@ using UnityEngine;
 
 public interface IBattleShip
 {
-    public Transform FireStartPosition { get; set; }
+    public Transform FireStartPosition { get;}
 }

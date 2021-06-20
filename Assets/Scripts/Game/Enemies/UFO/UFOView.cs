@@ -13,7 +13,7 @@ public class UFOView : BaseEnemyView, IBattleShip
         var collisionType = GetComponent<BaseUnitView>();
         if (collisionType is ShipView || collisionType is AsteroidView)
         {
-            collisionType.GetDamage(false);
+            collisionType.GetDamage();
         }
     }
 

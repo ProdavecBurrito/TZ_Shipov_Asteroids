@@ -62,6 +62,11 @@ public static class UpdatingController
         _updatingObjects.Clear();
     }
 
+    public static void RemoveAllFromFixedUpdate()
+    {
+        _fixedUpdates.Clear();
+    }
+
     public static void SubscribeToTUpdate(Action action)
     {
         OnUpdate += action;
