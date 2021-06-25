@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using Random = UnityEngine.Random;
 
-public class AsteroidController : IUpdate, ISpawner, IDisposable
+public class AsteroidPoolController : IUpdate, ISpawner, IDisposable
 {
     public event Action<Transform> OnCrack = delegate (Transform transform) { };
     public event Action<Asteroid> OnCreation = delegate (Asteroid asteroid) { };
@@ -14,10 +14,11 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
     private const int HALF_VALUE = 2;
 
     private AsteroidPool _asteroidPool;
-    private BaseAsteroidModel _asteroidModel;
+    private AsteroidData _asteroidData;
     private ScoreUI _scoreUI;
-    private GameObject navigationGO;
+    private GameObject _navigationGO;
     private AudioSource _audioSource;
+    private AudioClip _explosionClip;
 
     public AsteroidPool AsteroidPool => _asteroidPool;
 
@@ -25,26 +26,28 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
 
     public float SpawnWidth { get; private set; }
 
-    public AsteroidController(IUIValue scoreUI, string asteroidPrefabPath, int count, BaseAsteroidModel asteroidModel)
+    public AsteroidPoolController(IUIValue scoreUI, string asteroidPrefabPath, int count, AsteroidData asteroidData)
     {
+        _asteroidData = asteroidData;
         _scoreUI = (ScoreUI)scoreUI;
-        _asteroidModel = asteroidModel;
-        _asteroidPool = new AsteroidPool(count, _asteroidModel, asteroidPrefabPath);
+        _asteroidPool = new AsteroidPool(count, _asteroidData, asteroidPrefabPath);
 
-        navigationGO = new GameObject();
-        navigationGO.AddComponent(typeof(AudioSource));
+        _navigationGO = new GameObject();
+        _navigationGO.AddComponent(typeof(AudioSource));
 
-        _audioSource = navigationGO.GetComponent<AudioSource>();
+        _audioSource = _navigationGO.GetComponent<AudioSource>();
         _audioSource.volume = 0.5f;
-        _audioSource.clip = _asteroidModel.ExplosionClip;
+        _explosionClip = _explosionClip = ResourcesLoader.LoadObject<AudioClip>("AsteroidExplosion");
+        _audioSource.clip = _explosionClip;
+
 
         _asteroidPool.OnCreation += OnAsteroidCreation;
 
         foreach (var item in _asteroidPool.PollObjects)
         {
-            item.AsteroidView.OnPlayerHit += AddScore;
-            item.AsteroidView.OnHit += PlayExplosionSound;
-            if (item.AsteroidView is CrackingAsteroidsView asteroidsView)
+            item.OnPlayerHit += AddScore;
+            item.OnHit += PlayExplosionSound;
+            if (item is CrackingAsteroids asteroidsView)
             {
                 asteroidsView.OnCrack += OnAsteroidCrack;
             }
@@ -58,9 +61,9 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
 
     public void StartMoving()
     {
-        navigationGO.transform.position = CalculateStartPosition();
-        navigationGO.transform.rotation = CalculateRotation();
-        _asteroidPool.TryToAct(navigationGO.transform);
+        _navigationGO.transform.position = CalculateStartPosition();
+        _navigationGO.transform.rotation = CalculateRotation();
+        _asteroidPool.TryToAct(_navigationGO.transform);
     }
 
     public Vector2 CalculateStartPosition()
@@ -98,9 +101,9 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
 
     public void StartMoving(Transform startPosition, float rotationValue)
     {
-        navigationGO.transform.position = startPosition.position;
-        navigationGO.transform.rotation = CalculateRotation(startPosition, rotationValue);
-        _asteroidPool.TryToAct(navigationGO.transform);
+        _navigationGO.transform.position = startPosition.position;
+        _navigationGO.transform.rotation = CalculateRotation(startPosition, rotationValue);
+        _asteroidPool.TryToAct(_navigationGO.transform);
     }
 
     public bool IsPoolActive()
@@ -115,7 +118,7 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
 
     private void AddScore()
     {
-        _scoreUI.ManageValue(_asteroidModel.Score);
+        _scoreUI.ManageValue(_asteroidData.Score);
     }
 
     private Quaternion CalculateRotation()
@@ -133,7 +136,7 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
 
     private void OnAsteroidCreation(Asteroid asteroid)
     {
-        if (asteroid.AsteroidView is CrackingAsteroidsView crackingAsteroid)
+        if (asteroid is CrackingAsteroids crackingAsteroid)
         {
             crackingAsteroid.OnCrack += OnAsteroidCrack;
         }
@@ -149,8 +152,9 @@ public class AsteroidController : IUpdate, ISpawner, IDisposable
         _asteroidPool.OnCreation -= OnAsteroidCreation;
         foreach (var item in _asteroidPool.PollObjects)
         {
-            item.AsteroidView.OnPlayerHit -= AddScore;
-            if (item.AsteroidView is CrackingAsteroidsView asteroidsView)
+            item.OnPlayerHit -= AddScore;
+            item.OnHit -= PlayExplosionSound;
+            if (item is CrackingAsteroids asteroidsView)
             {
                 asteroidsView.OnCrack -= OnAsteroidCrack;
             }

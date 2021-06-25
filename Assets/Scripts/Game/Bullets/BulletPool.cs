@@ -33,7 +33,7 @@ public class BulletPool : BasePool<Bullet>, IUpdate
             {
                 for (int i = 0; i < _poolObjects.Count; i++)
                 {
-                    if (!_poolObjects[i].BulletView.IsActive)
+                    if (!_poolObjects[i].IsActive)
                     {
                         _currentBulletIndex = i;
                         Shoot(fireStartPosition);
@@ -48,7 +48,7 @@ public class BulletPool : BasePool<Bullet>, IUpdate
                 }
                 _isFoundBullet = false;
             }
-            else if (!_poolObjects[_currentBulletIndex].BulletView.IsActive)
+            else if (!_poolObjects[_currentBulletIndex].IsActive)
             {
                 Shoot(fireStartPosition);
             }
@@ -64,14 +64,15 @@ public class BulletPool : BasePool<Bullet>, IUpdate
         OnFire.Invoke();
     }
 
-    private BaseBulletView LoadBulletView()
+    private Bullet LoadBullet()
     {
-        return ResourcesLoader.LoadAndInstantiateObject<BaseBulletView>(_prefabPath);
+        return ResourcesLoader.LoadAndInstantiateObject<Bullet>(_prefabPath);
     }
 
     private Bullet CreateNewBullet()
     {
-        var bullet = new Bullet(_bulletData.Speed, _bulletData.MaxDistance, LoadBulletView(), _bulletData.BulletColor);
+        var bullet = LoadBullet();
+        bullet.GetData(_bulletData.Speed, _bulletData.MaxDistance, _bulletData.BulletColor);
         AddToPool(bullet);
         return bullet;
     }

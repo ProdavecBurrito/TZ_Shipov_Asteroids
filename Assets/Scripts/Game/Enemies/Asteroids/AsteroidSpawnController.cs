@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AsteroidSpawnController : BaseSpawner<List<AsteroidController>>
+public class AsteroidSpawnController : BaseSpawner<List<AsteroidPoolController>>
 {
     private const int SMALL_ASTEROID = 0;
     private const int MIDDLE_ASTEROID = 1;
@@ -11,12 +11,12 @@ public class AsteroidSpawnController : BaseSpawner<List<AsteroidController>>
     private SpawnTimeData _spawnTimeData;
     private int _currentAsteroidCount;
 
-    public AsteroidSpawnController(ScoreUI scoreController) : base(scoreController)
+    public AsteroidSpawnController(ScoreUI scoreUI) : base(scoreUI)
     {
-        spawnObject = new List<AsteroidController>();
-        spawnObject.Add(new AsteroidController(scoreController, "Prefabs/SmallAsteroid", ASTEROID_VALUE, new BaseAsteroidModel("Data/SmallAsteroid")));
-        spawnObject.Add(new AsteroidController(scoreController, "Prefabs/MiddleAsteroid", ASTEROID_VALUE, new BaseAsteroidModel("Data/MiddleAsteroid")));
-        spawnObject.Add(new AsteroidController(scoreController, "Prefabs/BigAsteroid", ASTEROID_VALUE, new BaseAsteroidModel("Data/BigAsteroid")));
+        spawnObject = new List<AsteroidPoolController>();
+        spawnObject.Add(new AsteroidPoolController(scoreUI, "Prefabs/SmallAsteroid", ASTEROID_VALUE, ResourcesLoader.LoadObject<AsteroidData>("Data/SmallAsteroid")));
+        spawnObject.Add(new AsteroidPoolController(scoreUI, "Prefabs/MiddleAsteroid", ASTEROID_VALUE, ResourcesLoader.LoadObject<AsteroidData>("Data/MiddleAsteroid")));
+        spawnObject.Add(new AsteroidPoolController(scoreUI, "Prefabs/BigAsteroid", ASTEROID_VALUE, ResourcesLoader.LoadObject<AsteroidData>("Data/BigAsteroid")));
         _spawnTimeData = ResourcesLoader.LoadObject<SpawnTimeData>("Data/AsteroidsSpawnTimer");
         _currentAsteroidCount = 2;
 

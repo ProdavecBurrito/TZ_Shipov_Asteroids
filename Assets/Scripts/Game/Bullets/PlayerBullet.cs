@@ -1,15 +1,15 @@
 using UnityEngine;
 
-public class PlayerBulletView : BaseBulletView
+public class PlayerBullet : Bullet
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var collisionType = collision.GetComponent<BaseEnemyView>();
+        var collisionType = collision.GetComponent<BaseEnemy>();
         {
             if (collisionType)
             {
                 collisionType.GetDamage();
-                if (collisionType is CrackingAsteroidsView asteroidsView)
+                if (collisionType is CrackingAsteroids asteroidsView)
                 {
                     asteroidsView.Crack();
                 }

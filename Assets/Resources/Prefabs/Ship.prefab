@@ -13,8 +13,8 @@ GameObject:
   - component: {fileID: 6925156432264793074}
   - component: {fileID: 4337134301261525428}
   - component: {fileID: -552359020774830246}
-  - component: {fileID: 3695811030353121960}
   - component: {fileID: 9102879450350544681}
+  - component: {fileID: -2365013188225477825}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -241,20 +241,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &3695811030353121960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7809511928832361235}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0fe43be8008f7274680e787851df261c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _audioSource: {fileID: 1511056474550992546}
-  _accelerationAudioSource: {fileID: 9102879450350544681}
 --- !u!82 &9102879450350544681
 AudioSource:
   m_ObjectHideFlags: 0
@@ -351,6 +337,20 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &-2365013188225477825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7809511928832361235}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebd8f04fbb8a924d99f705a2548f6de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _audioSource: {fileID: 1511056474550992546}
+  _accelerationAudioSource: {fileID: 9102879450350544681}
 --- !u!1 &8671672975774968187
 GameObject:
   m_ObjectHideFlags: 0

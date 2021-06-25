@@ -1,31 +1,36 @@
 using UnityEngine;
 
-public class Bullet
+public class Bullet : MonoBehaviour
 {
-    private float _currentPosition;
-    private BaseBulletView _bulletView;
+    private SpriteRenderer _spriteRenderer;
 
+    private float _currentPosition;
     private float _speed;
     private float _maxRange;
+    private bool _isActive;
+    public bool IsActive => _isActive;
 
-    public BaseBulletView BulletView => _bulletView;
+    public void Awake()
+    {
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        ChangeActiveState(false);
+    }
 
-    public Bullet(float speed, float maxRange, BaseBulletView bulletView, Color bulletColor)
+    public void GetData(float speed, float maxRange, Color bulletColor)
     {
         _speed = speed;
         _maxRange = maxRange;
-        _bulletView = bulletView;
-        _bulletView.SetColor(bulletColor);
+        SetColor(bulletColor);
     }
 
     public void Fly()
     {
-        if (_bulletView.IsActive)
+        if (IsActive)
         {
             if (_currentPosition < _maxRange)
             {
                 _currentPosition += _speed * Time.deltaTime;
-                _bulletView.transform.Translate(-Vector2.up * _speed * Time.deltaTime);
+                transform.Translate(-Vector2.up * _speed * Time.deltaTime);
             }
             else
             {
@@ -36,14 +41,25 @@ public class Bullet
 
     public void Fire(Transform fireStartPosition)
     {
-        _bulletView.transform.position = fireStartPosition.position;
-        _bulletView.transform.rotation = fireStartPosition.rotation;
+        transform.position = fireStartPosition.position;
+        transform.rotation = fireStartPosition.rotation;
         _currentPosition = 0;
-        _bulletView.ChangeActiveState(true);
+        ChangeActiveState(true);
     }
 
     public void ReturnToPool()
     {
-        _bulletView.ChangeActiveState(false);
+        ChangeActiveState(false);
+    }
+
+    public void ChangeActiveState(bool isActive)
+    {
+        gameObject.SetActive(isActive);
+        _isActive = isActive;
+    }
+
+    public void SetColor(Color color)
+    {
+        _spriteRenderer.color = color;
     }
 }

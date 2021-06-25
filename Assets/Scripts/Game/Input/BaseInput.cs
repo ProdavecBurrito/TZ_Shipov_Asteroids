@@ -36,7 +36,7 @@ public abstract class BaseInput
         return Input.GetKeyDown(KeyCode.Space);
     }
 
-    public void Shoot(BasePool<Bullet> bulletPool ,Transform fireStartPos)
+    public void Shoot(BulletPool bulletPool ,Transform fireStartPos)
     {
         bulletPool.TryToAct(fireStartPos);
     }

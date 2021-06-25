@@ -1,15 +1,9 @@
 using System;
 using UnityEngine;
 
-public class BaseEnemyView : BaseUnitView, IScoreKeeper
+public class BaseEnemy : BaseUnit, IScoreKeeper
 {
     public event Action OnPlayerHit = delegate () { };
-    
-    private void Awake()
-    {
-        _unitTransform = GetComponent<Transform>();
-        SetActivity(false);
-    }
 
     public override void GetDamage()
     {

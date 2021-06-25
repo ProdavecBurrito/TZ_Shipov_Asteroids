@@ -1,23 +1,30 @@
 using UnityEngine;
 
-public class Asteroid
+public class Asteroid : BaseEnemy
 {
-    private BaseEnemyView _asteroidView;
-
     private float _speed;
 
-    public BaseEnemyView AsteroidView => _asteroidView;
-
-    public Asteroid(BaseEnemyView asteroid)
+    private void Awake()
     {
-        _asteroidView = asteroid;
+        SetActivity(false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var collisionType = collision.GetComponent<BaseUnit>();
+        {
+            if (collisionType is PlayerShip || collisionType is UFO)
+            {
+                collisionType.GetDamage();
+            }
+        }
     }
 
     public void Fly()
     {
-        if (_asteroidView.IsActive)
+        if (IsActive)
         {
-            _asteroidView.transform.Translate(-Vector2.up * _speed * Time.deltaTime);
+            transform.Translate(-Vector2.up * _speed * Time.deltaTime);
         }
         else
         {
@@ -25,11 +32,11 @@ public class Asteroid
         }
     }
 
-    public void LaunchAsteroid(Transform startPosition)
+    public void Launch(Transform startPosition)
     {
-        _asteroidView.UnitTransform.position = startPosition.position;
-        _asteroidView.UnitTransform.rotation = startPosition.rotation;
-        _asteroidView.SetActivity(true);
+        transform.position = startPosition.position;
+        transform.rotation = startPosition.rotation;
+        SetActivity(true);
     }
 
 
@@ -40,6 +47,6 @@ public class Asteroid
 
     public void ReturnToPool()
     {
-        _asteroidView.SetActivity(false);
+        SetActivity(false);
     }
 }

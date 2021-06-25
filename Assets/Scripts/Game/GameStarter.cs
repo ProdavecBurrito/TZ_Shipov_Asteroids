@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GameStarter : MonoBehaviour
 {
     [SerializeField] private ScoreUI _scoreUI;
     [SerializeField] private HealthUI _healthUI;
@@ -8,7 +8,7 @@ public class GameController : MonoBehaviour
     private GameMenu _gameMenu;
     private GameOverMenu _gameOverMenu;
 
-    private ShipController _shipController;
+    private PlayerShip _playerShip;
     private UFOSpawnController _ufoSpawnController;
     private AsteroidSpawnController _asteroidSpawnController;
 
@@ -18,15 +18,16 @@ public class GameController : MonoBehaviour
         _healthUI = GetComponentInChildren<HealthUI>();
         _scoreUI = GetComponentInChildren<ScoreUI>();
 
-        _shipController = new ShipController(_gameMenu, _gameOverMenu, _healthUI);
+        _playerShip.InjectUI(_gameMenu, _gameOverMenu, _healthUI);
+
         _ufoSpawnController = new UFOSpawnController(_scoreUI);
         _asteroidSpawnController = new AsteroidSpawnController(_scoreUI);
 
-        _shipController.ShipModel.OnDie += GameOver;
+        _playerShip.OnDie += GameOver;
 
-        UpdatingController.AddToFixedUpdate(_shipController);
+        UpdatingController.AddToFixedUpdate(_playerShip);
         UpdatingController.AddToUpdate(_ufoSpawnController);
-        UpdatingController.AddToUpdate(_shipController);
+        UpdatingController.AddToUpdate(_playerShip);
         UpdatingController.AddToUpdate(_asteroidSpawnController);
     }
 
@@ -46,6 +47,7 @@ public class GameController : MonoBehaviour
         ResourcesLoader.LoadAndInstantiateObject<Border>("Prefabs/Border");
         _gameMenu = ResourcesLoader.LoadAndInstantiateObject<GameMenu>("Prefabs/GameMenu");
         _gameOverMenu = ResourcesLoader.LoadAndInstantiateObject<GameOverMenu>("Prefabs/GameOverMenu");
+        _playerShip = ResourcesLoader.LoadAndInstantiateObject<PlayerShip>("Prefabs/Ship");
     }
 
     private void GameOver()
@@ -58,6 +60,6 @@ public class GameController : MonoBehaviour
     {
         UpdatingController.RemoveAllFromUpdate();
         UpdatingController.RemoveAllFromFixedUpdate();
-        _shipController.ShipModel.OnDie -= GameOver;
+        _playerShip.OnDie -= GameOver;
     }
 }

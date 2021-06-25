@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class UFOBilletView : BaseBulletView
+public class UFOBillet : Bullet
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        var playerShip = collision.GetComponent<ShipView>();
+        var playerShip = collision.GetComponent<PlayerShip>();
         {
             if (playerShip != null)
             {

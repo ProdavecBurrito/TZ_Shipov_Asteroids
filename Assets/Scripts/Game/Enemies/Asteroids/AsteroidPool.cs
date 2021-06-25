@@ -6,13 +6,13 @@ public class AsteroidPool : BasePool<Asteroid>
 {
     public event Action<Asteroid> OnCreation = delegate (Asteroid asteroid) { };
 
-    private BaseAsteroidModel _asteroidModel;
+    private AsteroidData _asteroidData;
     private bool _isFoundAsteroid;
     private string _prefabPath;
 
-    public AsteroidPool(int count, BaseAsteroidModel asteroidModel, string astroidPrefabPath) : base(count)
+    public AsteroidPool(int count, AsteroidData asteroidData, string astroidPrefabPath) : base(count)
     {
-        _asteroidModel = asteroidModel;
+        _asteroidData = asteroidData;
         _prefabPath = astroidPrefabPath;
 
         for (int i = 0; i < count; i++)
@@ -25,7 +25,7 @@ public class AsteroidPool : BasePool<Asteroid>
     {
         for (int i = 0; i < _poolObjects.Count; i++)
         {
-            if (_poolObjects[i].AsteroidView.IsActive)
+            if (_poolObjects[i].IsActive)
             {
                 return true;
             }
@@ -47,7 +47,7 @@ public class AsteroidPool : BasePool<Asteroid>
         {
             for (int i = 0; i < _poolObjects.Count; i++)
             {
-                if (!_poolObjects[i].AsteroidView.IsActive)
+                if (!_poolObjects[i].IsActive)
                 {
                     _currentObjectIndex = i;
                     Launch(startPosition);
@@ -62,7 +62,7 @@ public class AsteroidPool : BasePool<Asteroid>
             }
         _isFoundAsteroid = false;
         }
-        else if (!_poolObjects[_currentObjectIndex].AsteroidView.IsActive)
+        else if (!_poolObjects[_currentObjectIndex].IsActive)
         {
             Launch(startPosition);
         }
@@ -70,20 +70,20 @@ public class AsteroidPool : BasePool<Asteroid>
 
     private void Launch(Transform startPosition)
     {
-        _poolObjects[_currentObjectIndex].LaunchAsteroid(startPosition);
-        var speed = Random.Range(_asteroidModel.MinSpeed, _asteroidModel.MaxSpeed);
+        _poolObjects[_currentObjectIndex].Launch(startPosition);
+        var speed = Random.Range(_asteroidData.MinSpeed, _asteroidData.MaxSpeed);
         _poolObjects[_currentObjectIndex].AssignSpeed(speed);
         _currentObjectIndex++;
     }
 
-    private BaseEnemyView LoadAsteroidView()
+    private Asteroid LoadNewAsteroid()
     {
-        return ResourcesLoader.LoadAndInstantiateObject<AsteroidView>(_prefabPath);
+        return ResourcesLoader.LoadAndInstantiateObject<Asteroid>(_prefabPath);
     }
 
     private Asteroid CreateNewAsteroid()
     {
-        var asteroid = new Asteroid(LoadAsteroidView());
+        var asteroid = LoadNewAsteroid();
         AddToPool(asteroid);
         OnCreation.Invoke(asteroid);
         return asteroid;

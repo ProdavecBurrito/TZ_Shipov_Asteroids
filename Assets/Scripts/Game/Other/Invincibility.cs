@@ -14,12 +14,9 @@ public class Invincibility : IUpdate, IDisposable
 
     public bool IsInvincible => _isInvincible;
 
-    public Invincibility(BaseUnitView shipView)
+    public Invincibility(SpriteShapeRenderer spriteShapeRenderer)
     {
-        if (shipView is ShipView ship)
-        {
-            _shipShapeRenderer = ship.ShipShapeRenderer;
-        }
+        _shipShapeRenderer = spriteShapeRenderer;
         _invincibletyTimer = new Timer();
     }
 
